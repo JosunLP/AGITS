@@ -1,4 +1,5 @@
 import fastify, { FastifyInstance } from 'fastify';
+import path from 'path';
 import { AppConfig } from '../config/app.js';
 import { Logger } from '../utils/logger.js';
 import { loggerPlugin } from './plugins/logger.js';
@@ -47,6 +48,17 @@ export class Server {
       await this.app.register(sensible.default);
     } catch (error) {
       this.logger.warn('Failed to register @fastify/sensible plugin:', error);
+    }
+
+    // Register static file serving
+    try {
+      const staticPlugin = await import('@fastify/static');
+      await this.app.register(staticPlugin.default, {
+        root: path.join(process.cwd(), 'public'),
+        prefix: '/', // optional: default '/'
+      });
+    } catch (error) {
+      this.logger.warn('Failed to register @fastify/static plugin:', error);
     }
 
     try {
@@ -448,6 +460,13 @@ export class Server {
    * Get the Fastify instance
    */
   public getFastifyInstance(): FastifyInstance {
+    return this.app;
+  }
+
+  /**
+   * Get the Fastify instance for registering additional routes
+   */
+  public getInstance(): FastifyInstance {
     return this.app;
   }
 

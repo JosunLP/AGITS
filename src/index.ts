@@ -4,6 +4,7 @@
  */
 
 import { appConfig } from './config/app.js';
+import { APIController } from './infrastructure/api-controller.js';
 import { HealthMonitor } from './infrastructure/health-monitor.js';
 import { MetricsCollector } from './infrastructure/metrics-collector.js';
 import { Server } from './infrastructure/server.js';
@@ -11,7 +12,10 @@ import { ServiceRegistry } from './infrastructure/service-registry.js';
 import { Logger } from './utils/logger.js';
 
 // Core cognitive services
+import { AutonomousKnowledgeCollector } from './core/autonomous-knowledge-collector.js';
+import { AutonomousProcessScheduler } from './core/autonomous-scheduler.js';
 import { ChemicalSignalingSystem } from './core/chemical-signaling.js';
+import { KnowledgeManagementSystem } from './core/knowledge-management.js';
 import { MemoryManagementSystem } from './core/memory-management.js';
 import { AttentionManager } from './services/cognitive/attention-manager.js';
 import { LearningOrchestrator } from './services/cognitive/learning-orchestrator.js';
@@ -19,6 +23,7 @@ import { ReasoningEngineService } from './services/cognitive/reasoning-engine.js
 import { NaturalLanguageProcessor } from './services/communication/nlp-service.js';
 import { DecisionEngine } from './services/executive/decision-engine.js';
 import { PlanningService } from './services/executive/planning-service.js';
+import { DataIngestionService } from './services/sensory/data-ingestion-service.js';
 
 /**
  * AGITS Platform - Main application class
@@ -33,6 +38,9 @@ export class AGITSPlatform {
   // Core systems
   private memorySystem: MemoryManagementSystem;
   private chemicalSignaling: ChemicalSignalingSystem;
+  private autonomousScheduler: AutonomousProcessScheduler;
+  private knowledgeSystem: KnowledgeManagementSystem;
+  private knowledgeCollector: AutonomousKnowledgeCollector;
 
   // Cognitive services
   private reasoningEngine: ReasoningEngineService;
@@ -45,6 +53,9 @@ export class AGITSPlatform {
 
   // Communication services
   private nlpService: NaturalLanguageProcessor;
+
+  // API Controller
+  private apiController: APIController;
 
   constructor() {
     this.logger = new Logger('AGITSPlatform');
@@ -66,6 +77,12 @@ export class AGITSPlatform {
     this.memorySystem = new MemoryManagementSystem();
     this.chemicalSignaling = new ChemicalSignalingSystem();
 
+    // Initialize knowledge management
+    this.knowledgeSystem = new KnowledgeManagementSystem(this.memorySystem);
+
+    // Initialize autonomous scheduler
+    this.autonomousScheduler = new AutonomousProcessScheduler();
+
     // Initialize cognitive services
     this.reasoningEngine = new ReasoningEngineService();
     this.learningOrchestrator = new LearningOrchestrator(this.memorySystem);
@@ -81,8 +98,28 @@ export class AGITSPlatform {
     // Initialize communication services
     this.nlpService = new NaturalLanguageProcessor();
 
+    // Initialize sensory services (if needed)
+    const dataIngestionService = new DataIngestionService();
+
+    // Initialize autonomous knowledge collector
+    this.knowledgeCollector = new AutonomousKnowledgeCollector(
+      this.knowledgeSystem,
+      this.memorySystem,
+      dataIngestionService
+    );
+
+    // Initialize API controller
+    this.apiController = new APIController(
+      this.knowledgeSystem,
+      this.autonomousScheduler,
+      this.memorySystem
+    );
+
     // Register services
     this.registerServices();
+
+    // Setup services for autonomous scheduler
+    this.setupAutonomousScheduler();
 
     // Setup inter-service communication
     this.setupInterServiceCommunication();
@@ -121,8 +158,31 @@ export class AGITSPlatform {
       this.planningService
     );
     this.serviceRegistry.registerService('nlp-service', this.nlpService);
+    this.serviceRegistry.registerService(
+      'knowledge-management',
+      this.knowledgeSystem
+    );
 
     this.logger.info('All services registered successfully');
+  }
+
+  /**
+   * Setup autonomous scheduler with system services
+   */
+  private setupAutonomousScheduler(): void {
+    this.logger.info('Setting up autonomous scheduler...');
+
+    // Configure scheduler with cognitive services
+    this.autonomousScheduler.setServices({
+      memorySystem: this.memorySystem,
+      learningOrchestrator: this.learningOrchestrator,
+      reasoningEngine: this.reasoningEngine,
+      attentionManager: this.attentionManager,
+      decisionEngine: this.decisionEngine,
+      planningService: this.planningService,
+    });
+
+    this.logger.info('Autonomous scheduler setup successfully');
   }
 
   /**
@@ -173,6 +233,9 @@ export class AGITSPlatform {
       // Start the server
       await this.server.start();
 
+      // Register API routes
+      this.apiController.registerRoutes(this.server.getInstance());
+
       this.logger.info(
         `AGITS Platform started successfully on ${appConfig.host}:${appConfig.port}`
       );
@@ -203,6 +266,12 @@ export class AGITSPlatform {
 
     // Start decision loop
     this.decisionEngine.startDecisionLoop();
+
+    // Start autonomous process scheduler
+    this.autonomousScheduler.start();
+
+    // Start autonomous knowledge collection
+    this.knowledgeCollector.start();
 
     this.logger.info('Cognitive processes started successfully');
   }

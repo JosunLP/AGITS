@@ -38,8 +38,8 @@
     "noUnusedParameters": false,
     "exactOptionalPropertyTypes": true
   },
-  "include": ["src/**/*", "tests/**/*", "src/types/node.d.ts"],
-  "exclude": ["node_modules", "dist", "coverage", "**/*.test.ts"],
+  "include": ["src/**/*", "src/types/node.d.ts"],
+  "exclude": ["node_modules", "dist", "coverage", "tests", "**/*.test.ts"],
   "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node"
