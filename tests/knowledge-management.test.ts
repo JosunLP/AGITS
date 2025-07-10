@@ -1,9 +1,11 @@
+import { defaultLearningConfig } from '../src/config/app.js';
 import {
   ConfidenceLevel,
   KnowledgeManagementSystem,
   KnowledgeType,
 } from '../src/core/knowledge-management';
 import { MemoryManagementSystem } from '../src/core/memory-management';
+import { KnowledgeSourceType, KnowledgeStatus } from '../src/types/index.js';
 
 describe('KnowledgeManagementSystem', () => {
   let knowledgeSystem: KnowledgeManagementSystem;
@@ -18,30 +20,50 @@ describe('KnowledgeManagementSystem', () => {
       searchMemories: jest.fn().mockReturnValue([]),
     } as any;
 
-    knowledgeSystem = new KnowledgeManagementSystem(memorySystem);
+    knowledgeSystem = new KnowledgeManagementSystem(
+      memorySystem,
+      defaultLearningConfig
+    );
   });
 
   describe('knowledge storage', () => {
-    test('should add knowledge to knowledge base', () => {
+    test('should add knowledge to knowledge base', async () => {
+      // Create a simple knowledge item that matches the interface requirements
       const testKnowledge = {
         type: KnowledgeType.FACTUAL,
         content: 'Test knowledge content',
         subject: 'testing',
         confidence: 0.8,
-        confidenceLevel: ConfidenceLevel.HIGH,
-        sources: ['test-source'],
+        source: KnowledgeSourceType.USER_INTERACTION,
         tags: ['test', 'example'],
+        status: KnowledgeStatus.VALIDATED,
         relationships: [],
-        verification: {
-          isVerified: false,
-          verificationScore: 0.5,
+        validation: {
+          isVerified: true,
+          verificationScore: 0.9,
           contradictions: [],
-          supportingEvidence: [],
+          supportingEvidence: ['test-evidence'],
         },
-        metadata: { source: 'test' },
+        metadata: {
+          domain: 'test',
+          complexity: 0.5,
+          importance: 0.8,
+          frequency: 1,
+          context: {},
+          lastReviewed: new Date(),
+          source: 'test',
+          tags: [],
+          version: 1,
+          changeHistory: [],
+          derivedFrom: [],
+          relatedConcepts: [],
+          applications: [],
+          limitations: [],
+          assumptions: [],
+        },
       };
 
-      const knowledgeId = knowledgeSystem.addKnowledge(testKnowledge);
+      const knowledgeId = await knowledgeSystem.addKnowledge(testKnowledge);
       expect(knowledgeId).toBeDefined();
       expect(typeof knowledgeId).toBe('string');
       expect(knowledgeId).toMatch(/^knowledge_/);

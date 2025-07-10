@@ -1,5 +1,6 @@
 import { AGITSPlatform } from '../src/index';
 import { LearningType, MemoryType } from '../src/types/index';
+import { defaultLearningConfig } from '../src/config/app.js';
 
 describe('AGITS Platform Integration', () => {
   let platform: AGITSPlatform;

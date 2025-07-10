@@ -4,6 +4,7 @@ import { AutonomousProcessScheduler } from '../src/core/autonomous-scheduler.js'
 import { KnowledgeManagementSystem } from '../src/core/knowledge-management.js';
 import { MemoryManagementSystem } from '../src/core/memory-management.js';
 import { APIController } from '../src/infrastructure/api-controller.js';
+import { defaultLearningConfig } from '../src/config/app.js';
 
 describe('AGITS API Integration Tests (No Server)', () => {
   let apiController: APIController;
@@ -11,8 +12,8 @@ describe('AGITS API Integration Tests (No Server)', () => {
 
   beforeEach(() => {
     // Initialize core systems for each test
-    const memorySystem = new MemoryManagementSystem();
-    const knowledgeSystem = new KnowledgeManagementSystem(memorySystem);
+    const memorySystem = new MemoryManagementSystem(defaultLearningConfig);
+    const knowledgeSystem = new KnowledgeManagementSystem(memorySystem, defaultLearningConfig);
     const scheduler = new AutonomousProcessScheduler();
 
     // Initialize API controller

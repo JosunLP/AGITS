@@ -4,6 +4,7 @@ import { AutonomousProcessScheduler } from '../src/core/autonomous-scheduler.js'
 import { KnowledgeManagementSystem } from '../src/core/knowledge-management.js';
 import { MemoryManagementSystem } from '../src/core/memory-management.js';
 import { APIController } from '../src/infrastructure/api-controller.js';
+import { defaultLearningConfig } from '../src/config/app.js';
 
 describe('AGITS API Integration Tests (Simplified)', () => {
   let server: FastifyInstance;
@@ -12,8 +13,8 @@ describe('AGITS API Integration Tests (Simplified)', () => {
   beforeAll(async () => {
     try {
       // Initialize only core systems for basic testing
-      const memorySystem = new MemoryManagementSystem();
-      const knowledgeSystem = new KnowledgeManagementSystem(memorySystem);
+      const memorySystem = new MemoryManagementSystem(defaultLearningConfig);
+      const knowledgeSystem = new KnowledgeManagementSystem(memorySystem, defaultLearningConfig);
       const scheduler = new AutonomousProcessScheduler();
 
       // Initialize API controller with minimal services

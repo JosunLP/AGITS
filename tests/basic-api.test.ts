@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { fastify } from 'fastify';
+import { defaultLearningConfig } from '../src/config/app.js';
 
 describe('Basic API Test', () => {
   it('should work with basic Fastify setup', async () => {

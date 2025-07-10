@@ -1,3 +1,4 @@
+import { defaultLearningConfig } from '../src/config/app.js';
 import { AutonomousKnowledgeCollector } from '../src/core/autonomous-knowledge-collector';
 import { KnowledgeManagementSystem } from '../src/core/knowledge-management';
 import { MemoryManagementSystem } from '../src/core/memory-management';
@@ -11,8 +12,11 @@ describe('AutonomousKnowledgeCollector', () => {
   let dataIngestion: DataIngestionService;
 
   beforeEach(() => {
-    memorySystem = new MemoryManagementSystem();
-    knowledgeSystem = new KnowledgeManagementSystem(memorySystem);
+    memorySystem = new MemoryManagementSystem(defaultLearningConfig);
+    knowledgeSystem = new KnowledgeManagementSystem(
+      memorySystem,
+      defaultLearningConfig
+    );
     dataIngestion = new DataIngestionService();
     knowledgeCollector = new AutonomousKnowledgeCollector(
       knowledgeSystem,

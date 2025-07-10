@@ -20,6 +20,7 @@ import { NaturalLanguageProcessor } from '../src/services/communication/nlp-serv
 import { DecisionEngine } from '../src/services/executive/decision-engine.js';
 import { PlanningService } from '../src/services/executive/planning-service.js';
 import { LearningType, MemoryType } from '../src/types/index.js';
+import { defaultLearningConfig } from '../src/config/app.js';
 
 describe('AGITS API Integration Tests', () => {
   let memorySystem: MemoryManagementSystem;
@@ -38,8 +39,8 @@ describe('AGITS API Integration Tests', () => {
 
   beforeAll(async () => {
     // Initialize core systems
-    memorySystem = new MemoryManagementSystem();
-    knowledgeSystem = new KnowledgeManagementSystem(memorySystem);
+    memorySystem = new MemoryManagementSystem(defaultLearningConfig);
+    knowledgeSystem = new KnowledgeManagementSystem(memorySystem, defaultLearningConfig);
     scheduler = new AutonomousProcessScheduler();
 
     // Initialize cognitive services

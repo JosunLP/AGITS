@@ -1,4 +1,5 @@
 import { AGITSPlatform } from '../src/index';
+import { defaultLearningConfig } from '../src/config/app.js';
 
 describe('AGITS Platform Integration', () => {
   let platform: AGITSPlatform;

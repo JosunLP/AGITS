@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
+import { defaultLearningConfig } from '../src/config/app.js';
 import { AutonomousKnowledgeCollector } from '../src/core/autonomous-knowledge-collector.js';
 import { AutonomousProcessScheduler } from '../src/core/autonomous-scheduler.js';
 import { KnowledgeManagementSystem } from '../src/core/knowledge-management.js';
@@ -22,8 +23,11 @@ describe('AGITS System Evolution and Autonomous Learning', () => {
   let nlpService: NaturalLanguageProcessor;
 
   beforeEach(() => {
-    memorySystem = new MemoryManagementSystem();
-    knowledgeSystem = new KnowledgeManagementSystem(memorySystem);
+    memorySystem = new MemoryManagementSystem(defaultLearningConfig);
+    knowledgeSystem = new KnowledgeManagementSystem(
+      memorySystem,
+      defaultLearningConfig
+    );
     scheduler = new AutonomousProcessScheduler();
     learningOrchestrator = new LearningOrchestrator(memorySystem);
     reasoningEngine = new ReasoningEngineService();

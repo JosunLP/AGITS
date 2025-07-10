@@ -5,6 +5,7 @@ import { LearningOrchestrator } from '../src/services/cognitive/learning-orchest
 import { ReasoningEngineService } from '../src/services/cognitive/reasoning-engine';
 import { DecisionEngine } from '../src/services/executive/decision-engine';
 import { PlanningService } from '../src/services/executive/planning-service';
+import { defaultLearningConfig } from '../src/config/app.js';
 import {
   LearningExperience,
   LearningType,
@@ -22,8 +23,8 @@ describe('AGITS System Integration Tests (Working)', () => {
 
   beforeEach(() => {
     // Initialize core systems with correct constructor arguments
-    memorySystem = new MemoryManagementSystem();
-    knowledgeSystem = new KnowledgeManagementSystem(memorySystem);
+    memorySystem = new MemoryManagementSystem(defaultLearningConfig);
+    knowledgeSystem = new KnowledgeManagementSystem(memorySystem, defaultLearningConfig);
     scheduler = new AutonomousProcessScheduler();
     learningOrchestrator = new LearningOrchestrator(memorySystem);
     reasoningEngine = new ReasoningEngineService();
