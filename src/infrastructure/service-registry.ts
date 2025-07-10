@@ -44,7 +44,10 @@ export class ServiceRegistry extends EventEmitter {
       status: ServiceStatus.HEALTHY,
       lastHeartbeat: new Date(),
       metrics: this.getDefaultMetrics(),
-      errors: [], uptime: 0, version: "1.0.0", dependencies: [],
+      errors: [],
+      uptime: 0,
+      version: '1.0.0',
+      dependencies: [],
     });
 
     this.logger.info(`Service registered: ${name}`);
@@ -227,6 +230,8 @@ export class ServiceRegistry extends EventEmitter {
       stack: error.stack || '',
       timestamp: new Date(),
       severity: 'error' as any,
+      level: 'error',
+      context: {},
       resolved: false,
     });
 
@@ -264,7 +269,11 @@ export class ServiceRegistry extends EventEmitter {
       responseTime: 0,
       throughput: 0,
       errorRate: 0,
-      custom: {},
+      requests: 0,
+      errors: 0,
+      latency: 0,
+      availability: 1.0,
+      customMetrics: {},
     };
   }
 

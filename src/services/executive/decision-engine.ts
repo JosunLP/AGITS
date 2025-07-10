@@ -1,8 +1,10 @@
 import { MemoryManagementSystem } from '../../core/memory-management.js';
 import {
+  ConsolidationPhase,
   Constraint,
   Decision,
   Goal,
+  MemoryPriority,
   MemoryType,
   ProcessingContext,
   TaskType,
@@ -302,6 +304,8 @@ export class DecisionEngine extends TypedEventEmitter<DecisionEngineEvents> {
       priority: 1,
       requiredResources: [],
       dependencies: [],
+      status: 'pending' as const,
+      createdAt: new Date(),
     };
 
     const reasoningResult =
@@ -490,10 +494,29 @@ export class DecisionEngine extends TypedEventEmitter<DecisionEngineEvents> {
       },
       connections: [],
       strength: result.confidence,
+      priority: MemoryPriority.NORMAL,
+      createdAt: new Date(),
+      decayRate: 0.01,
+      consolidationLevel: 1,
       metadata: {
-        decisionEngine: true,
-        success: result.success,
-        processingTime: result.processingTime,
+        tags: ['decision', 'automated'],
+        source: 'decision_engine',
+        category: 'decision',
+        importance: result.confidence,
+        lastAccessed: new Date(),
+        accessCount: 1,
+        validationStatus: 'pending' as const,
+        relatedConcepts: [],
+        emotionalValence: 0.5,
+        contextualRelevance: 0.8,
+        consolidationPhase: ConsolidationPhase.ENCODING,
+        associatedGoals: [],
+        confidence: result.confidence,
+        context: {
+          decisionEngine: true,
+          success: result.success,
+          processingTime: result.processingTime,
+        },
       },
     });
   }
@@ -523,6 +546,7 @@ export class DecisionEngine extends TypedEventEmitter<DecisionEngineEvents> {
               environment: {},
               goals: [goal],
               constraints: Array.from(this.activeConstraints.values()),
+              metadata: {},
             },
             priority: goal.priority,
             timeout: this.DECISION_TIMEOUT,

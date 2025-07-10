@@ -108,6 +108,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
           error: {
             code: 'MODEL_EXISTS',
             message: `Model ${modelInfo.name} already exists`,
+            timestamp: new Date(),
           },
         };
       }
@@ -118,6 +119,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
           error: {
             code: 'REGISTRY_FULL',
             message: 'Model registry is full',
+            timestamp: new Date(),
           },
         };
       }
@@ -153,6 +155,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
             error instanceof Error
               ? error.message
               : 'Unknown registration error',
+          timestamp: new Date(),
         },
       };
     }
@@ -173,6 +176,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
           error: {
             code: 'MODEL_NOT_FOUND',
             message: `Model ${modelName} not found`,
+            timestamp: new Date(),
           },
         };
       }
@@ -184,6 +188,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
           error: {
             code: 'VERSION_LIMIT_EXCEEDED',
             message: `Maximum versions exceeded for model ${modelName}`,
+            timestamp: new Date(),
           },
         };
       }
@@ -227,6 +232,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
             error instanceof Error
               ? error.message
               : 'Unknown version creation error',
+          timestamp: new Date(),
         },
       };
     }
@@ -249,6 +255,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
           error: {
             code: 'MODEL_NOT_FOUND',
             message: `Model ${modelName} not found`,
+            timestamp: new Date(),
           },
         };
       }
@@ -260,6 +267,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
           error: {
             code: 'VERSION_NOT_FOUND',
             message: `Version ${version} not found for model ${modelName}`,
+            timestamp: new Date(),
           },
         };
       }
@@ -301,6 +309,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
             error instanceof Error
               ? error.message
               : 'Unknown stage transition error',
+          timestamp: new Date(),
         },
       };
     }
@@ -320,7 +329,11 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
         return {
           success: false,
           error: modelVersion.error,
-          metadata: { timestamp: new Date().toISOString(), requestId: `deploy-${Date.now(), processingTime: 0, version: "1.0.0" }`,
+          metadata: {
+            timestamp: new Date().toISOString(),
+            requestId: `deploy-${Date.now()}`,
+            processingTime: 0,
+            version: '1.0.0',
             source: 'ModelRegistryService',
           },
         } as APIResponse<ModelDeployment>;
@@ -335,6 +348,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
           error: {
             code: 'INVALID_STAGE',
             message: 'Only production stage models can be deployed',
+            timestamp: new Date(),
           },
         };
       }
@@ -377,6 +391,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
           code: 'DEPLOYMENT_ERROR',
           message:
             error instanceof Error ? error.message : 'Unknown deployment error',
+          timestamp: new Date(),
         },
       };
     }
@@ -393,6 +408,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
         error: {
           code: 'MODEL_NOT_FOUND',
           message: `Model ${modelName} not found`,
+          timestamp: new Date(),
         },
       };
     }
@@ -417,6 +433,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
         error: {
           code: 'MODEL_NOT_FOUND',
           message: `Model ${modelName} not found`,
+          timestamp: new Date(),
         },
       };
     }
@@ -428,6 +445,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
         error: {
           code: 'VERSION_NOT_FOUND',
           message: `Version ${version} not found for model ${modelName}`,
+          timestamp: new Date(),
         },
       };
     }
@@ -476,6 +494,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
         error: {
           code: 'MODEL_NOT_FOUND',
           message: `Model ${modelName} not found`,
+          timestamp: new Date(),
         },
       };
     }
@@ -523,6 +542,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
           error: {
             code: 'MODEL_NOT_FOUND',
             message: `Model ${modelName} not found`,
+            timestamp: new Date(),
           },
         };
       }
@@ -539,6 +559,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
           error: {
             code: 'MODEL_IN_USE',
             message: `Model ${modelName} has active deployments`,
+            timestamp: new Date(),
           },
         };
       }
@@ -558,6 +579,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
           code: 'DELETION_ERROR',
           message:
             error instanceof Error ? error.message : 'Unknown deletion error',
+          timestamp: new Date(),
         },
       };
     }

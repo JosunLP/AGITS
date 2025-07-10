@@ -45,6 +45,7 @@ export class ReasoningEngineService extends TypedEventEmitter<ReasoningEngineEve
           error: {
             code: 'INVALID_TASK_TYPE',
             message: 'Task must be of type REASONING',
+            timestamp: new Date(),
           },
         };
       }
@@ -85,6 +86,7 @@ export class ReasoningEngineService extends TypedEventEmitter<ReasoningEngineEve
           code: 'REASONING_ERROR',
           message:
             error instanceof Error ? error.message : 'Unknown reasoning error',
+          timestamp: new Date(),
         },
       };
     }

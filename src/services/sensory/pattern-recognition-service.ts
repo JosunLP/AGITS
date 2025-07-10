@@ -1,4 +1,8 @@
-import { APIResponse, DataModalityInput, ModalityType } from '../../types/index.js';
+import {
+  APIResponse,
+  DataModalityInput,
+  ModalityType,
+} from '../../types/index.js';
 import { EventMap, TypedEventEmitter } from '../../utils/event-emitter.js';
 import { Logger } from '../../utils/logger.js';
 
@@ -110,6 +114,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
           error: {
             code: 'QUEUE_FULL',
             message: 'Recognition queue is full, please try again later',
+            timestamp: new Date(),
           },
         };
       }
@@ -142,7 +147,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
           selectedModels: task.modelIds,
           requestId: `req_${Date.now()}`,
           processingTime: 0,
-          version: "1.0.0"
+          version: '1.0.0',
         },
       };
     } catch (error) {
@@ -155,6 +160,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
             error instanceof Error
               ? error.message
               : 'Unknown recognition error',
+          timestamp: new Date(),
         },
       };
     }
@@ -174,10 +180,8 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
           success: false,
           error: {
             code: 'MODEL_NOT_FOUND',
-            message: `Model ${modelId,
-            timestamp: new Date()
-          } not found`,
-            timestamp: new Date()
+            message: `Model ${modelId} not found`,
+            timestamp: new Date(),
           },
         };
       }
@@ -213,6 +217,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
           code: 'TRAINING_ERROR',
           message:
             error instanceof Error ? error.message : 'Unknown training error',
+          timestamp: new Date(),
         },
       };
     }
@@ -227,11 +232,9 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
       return {
         success: false,
         error: {
-            code: 'MODEL_NOT_FOUND',
-            message: `Model ${modelId,
-            timestamp: new Date()
-          } not found`,
-            timestamp: new Date()
+          code: 'MODEL_NOT_FOUND',
+          message: `Model ${modelId} not found`,
+          timestamp: new Date(),
         },
       };
     }
