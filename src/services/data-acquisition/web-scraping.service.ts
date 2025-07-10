@@ -956,6 +956,96 @@ export class WebScrapingService
     };
   }
 
+  /**
+   * Scrape content from URL with selectors
+   */
+  public async scrape(
+    url: string,
+    selectors?: Record<string, string>,
+    options?: {
+      useCache?: boolean;
+      priority?: number;
+      timeout?: number;
+    }
+  ): Promise<ScrapedContent> {
+    const source = this.findSourceByDomain(url);
+    if (!source) {
+      throw new Error(`URL not from trusted source: ${url}`);
+    }
+
+    // Check cache first
+    if (options?.useCache !== false) {
+      const cached = this.getFromCache(url);
+      if (cached) {
+        return cached;
+      }
+    }
+
+    // Check rate limiting
+    if (!this.checkRateLimit(source.id)) {
+      throw new Error(`Rate limit exceeded for source: ${source.name}`);
+    }
+
+    try {
+      const content = await this.scrapeUrl(url, source.id);
+      if (!content) {
+        throw new Error(`Failed to scrape content from ${url}`);
+      }
+
+      this.updateRateLimit(source.id);
+
+      // Cache result
+      if (options?.useCache !== false) {
+        this.setCache(url, content);
+      }
+
+      this.emit('contentScraped', { url, content, source: source.id });
+      return content;
+    } catch (error) {
+      this.logger.error(`Scraping failed for ${url}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Find source by domain
+   */
+  private findSourceByDomain(url: string): TrustedSource | undefined {
+    try {
+      const domain = new URL(url).hostname;
+      return Array.from(this.trustedSources.values()).find((source) =>
+        domain.includes(source.domain)
+      );
+    } catch {
+      return undefined;
+    }
+  }
+
+  /**
+   * Get content from cache
+   */
+  private getFromCache(url: string): ScrapedContent | null {
+    const entry = this.cache.get(url);
+    if (!entry) return null;
+
+    if (Date.now() > entry.expiry.getTime()) {
+      this.cache.delete(url);
+      return null;
+    }
+
+    return entry.content;
+  }
+
+  /**
+   * Set content in cache
+   */
+  private setCache(url: string, content: ScrapedContent): void {
+    this.cache.set(url, {
+      content,
+      expiry: new Date(Date.now() + this.CACHE_DURATION),
+    });
+  }
+
   // Add missing properties for stats
   private totalRequests = 0;
   private successfulRequests = 0;

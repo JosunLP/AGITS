@@ -2,12 +2,11 @@ import { FastifyInstance } from 'fastify';
 import { AutonomousKnowledgeCollector } from '../core/autonomous-knowledge-collector.js';
 import { AutonomousProcessScheduler } from '../core/autonomous-scheduler.js';
 import { ChemicalSignalingSystem } from '../core/chemical-signaling.js';
-import { EnhancedAutonomousKnowledgeCollector } from '../core/enhanced-autonomous-knowledge-collector.js';
 import { KnowledgeManagementSystem } from '../core/knowledge-management.js';
 import { MemoryManagementSystem } from '../core/memory-management.js';
 import { AttentionManager } from '../services/cognitive/attention-manager.js';
 import { LearningOrchestrator } from '../services/cognitive/learning-orchestrator.js';
-import { ReasoningEngineService } from '../services/cognitive/reasoning-engine-enhanced.js';
+import { ReasoningEngineService } from '../services/cognitive/reasoning-engine.js';
 import { NaturalLanguageProcessor } from '../services/communication/nlp-service.js';
 import { DecisionEngine } from '../services/executive/decision-engine.js';
 import { PlanningService } from '../services/executive/planning-service.js';
@@ -30,7 +29,7 @@ export class APIController {
   private scheduler: AutonomousProcessScheduler;
   private memorySystem: MemoryManagementSystem;
   private knowledgeCollector?: AutonomousKnowledgeCollector;
-  private enhancedKnowledgeCollector?: EnhancedAutonomousKnowledgeCollector;
+  private enhancedKnowledgeCollector?: AutonomousKnowledgeCollector;
   private chemicalSignaling?: ChemicalSignalingSystem;
   private learningOrchestrator?: LearningOrchestrator;
   private reasoningEngine?: ReasoningEngineService;
@@ -45,7 +44,7 @@ export class APIController {
     memorySystem: MemoryManagementSystem,
     options?: {
       knowledgeCollector?: AutonomousKnowledgeCollector;
-      enhancedKnowledgeCollector?: EnhancedAutonomousKnowledgeCollector;
+      enhancedKnowledgeCollector?: AutonomousKnowledgeCollector;
       chemicalSignaling?: ChemicalSignalingSystem;
       learningOrchestrator?: LearningOrchestrator;
       reasoningEngine?: ReasoningEngineService;
@@ -860,7 +859,7 @@ export class APIController {
         },
         knowledge: this.knowledgeSystem.getKnowledgeStats(),
         processes: this.scheduler.getStats(),
-        collection: this.knowledgeCollector?.getCollectionStats() || null,
+        collection: this.knowledgeCollector?.getStatus() || null,
         learning: this.learningOrchestrator?.getLearningStats() || null,
         attention: this.attentionManager?.getAttentionStats() || null,
         chemicalSignaling: this.chemicalSignaling?.getSystemStats() || null,
@@ -1129,10 +1128,9 @@ export class APIController {
       if (this.reasoningEngine) {
         const actualPremises = premises || [`Given problem: ${problem}`];
         const actualGoal = goal || problem;
-        result = await this.reasoningEngine.chainOfThoughtReasoning(
-          actualPremises,
-          actualGoal,
-          context || {}
+        result = await this.reasoningEngine.performReasoning(
+          `Chain of thought reasoning for: ${actualPremises.join(' ')} -> ${actualGoal}`,
+          { strategy: 'chain_of_thought', context: context || {} }
         );
       } else {
         // Fallback implementation

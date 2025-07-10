@@ -322,7 +322,7 @@ export class DecisionEngine extends TypedEventEmitter<DecisionEngineEvents> {
       option,
       confidence,
       reasoning: reasoningResult.success
-        ? reasoningResult.data?.reasoning || 'Reasoning completed'
+        ? reasoningResult.data?.conclusion || 'Reasoning completed'
         : 'Reasoning failed',
       goalAlignment,
       riskScore,

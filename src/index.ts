@@ -15,13 +15,12 @@ import { Logger } from './utils/logger.js';
 import { AutonomousKnowledgeCollector } from './core/autonomous-knowledge-collector.js';
 import { AutonomousProcessScheduler } from './core/autonomous-scheduler.js';
 import { ChemicalSignalingSystem } from './core/chemical-signaling.js';
-import { EnhancedAutonomousKnowledgeCollector } from './core/enhanced-autonomous-knowledge-collector.js';
 import { KnowledgeManagementSystem } from './core/knowledge-management.js';
 import { MemoryManagementSystem } from './core/memory-management.js';
 import { DataPersistenceLayer } from './infrastructure/data-persistence-layer.js';
 import { AttentionManager } from './services/cognitive/attention-manager.js';
 import { LearningOrchestrator } from './services/cognitive/learning-orchestrator.js';
-import { ReasoningEngineService } from './services/cognitive/reasoning-engine-enhanced.js';
+import { ReasoningEngineService } from './services/cognitive/reasoning-engine.js';
 import { NaturalLanguageProcessor } from './services/communication/nlp-service.js';
 import { DecisionEngine } from './services/executive/decision-engine.js';
 import { PlanningService } from './services/executive/planning-service.js';
@@ -43,7 +42,6 @@ export class AGITSPlatform {
   private autonomousScheduler: AutonomousProcessScheduler;
   private knowledgeSystem: KnowledgeManagementSystem;
   private knowledgeCollector: AutonomousKnowledgeCollector;
-  private enhancedKnowledgeCollector: EnhancedAutonomousKnowledgeCollector;
 
   // Cognitive services
   private reasoningEngine: ReasoningEngineService;
@@ -129,7 +127,7 @@ export class AGITSPlatform {
     );
 
     // Initialize enhanced autonomous knowledge collector
-    this.enhancedKnowledgeCollector = new EnhancedAutonomousKnowledgeCollector(
+    this.knowledgeCollector = new AutonomousKnowledgeCollector(
       this.knowledgeSystem,
       this.memorySystem,
       dataIngestionService,
@@ -143,7 +141,6 @@ export class AGITSPlatform {
       this.memorySystem,
       {
         knowledgeCollector: this.knowledgeCollector,
-        enhancedKnowledgeCollector: this.enhancedKnowledgeCollector,
         chemicalSignaling: this.chemicalSignaling,
         learningOrchestrator: this.learningOrchestrator,
         reasoningEngine: this.reasoningEngine,
@@ -318,7 +315,7 @@ export class AGITSPlatform {
     this.knowledgeCollector.start();
 
     // Start enhanced autonomous knowledge collection
-    this.enhancedKnowledgeCollector.startEnhancedCollection();
+    this.knowledgeCollector.start();
 
     this.logger.info('Cognitive processes started successfully');
   }

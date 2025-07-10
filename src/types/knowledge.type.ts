@@ -12,21 +12,36 @@ export enum KnowledgeType {
   DECLARATIVE = 'declarative',
   EPISODIC = 'episodic',
   SEMANTIC = 'semantic',
+  PATTERN = 'pattern',
+  RELATIONAL = 'relational',
 }
 
 export enum KnowledgeSourceType {
   MEMORY_CONSOLIDATION = 'memory_consolidation',
+  MEMORY_ANALYSIS = 'memory_analysis',
   PATTERN_DISCOVERY = 'pattern_discovery',
+  PATTERN_ANALYSIS = 'pattern_analysis',
   CROSS_REFERENCE = 'cross_reference',
   SENSOR_DATA = 'sensor_data',
   EXTERNAL_API = 'external_api',
+  WEB_SCRAPING = 'web_scraping',
   USER_INTERACTION = 'user_interaction',
   SYSTEM_OBSERVATION = 'system_observation',
   INFERENCE = 'inference',
   REASONING = 'reasoning',
+  KNOWLEDGE_GRAPH = 'knowledge_graph',
+  DATABASE_QUERY = 'database_query',
+  FILE_SYSTEM = 'file_system',
+  STREAMING_DATA = 'streaming_data',
 }
 
 export enum CollectionStrategy {
+  WEB_SCRAPING = 'web_scraping',
+  API_INTEGRATION = 'api_integration',
+  MEMORY_ANALYSIS = 'memory_analysis',
+  PATTERN_DISCOVERY = 'pattern_discovery',
+  CROSS_REFERENCE = 'cross_reference',
+  SENSOR_DATA = 'sensor_data',
   CONTINUOUS = 'continuous',
   SCHEDULED = 'scheduled',
   EVENT_DRIVEN = 'event_driven',

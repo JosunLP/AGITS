@@ -303,3 +303,103 @@ export interface EnhancedCollectionMetrics {
     popularCategories: Array<{ category: string; count: number }>;
   };
 }
+
+/**
+ * Collection strategy types
+ */
+export enum CollectionStrategy {
+  WEB_SCRAPING = 'web_scraping',
+  API_INTEGRATION = 'api_integration',
+  MEMORY_ANALYSIS = 'memory_analysis',
+  PATTERN_DISCOVERY = 'pattern_discovery',
+  CROSS_REFERENCE = 'cross_reference',
+  SENSOR_DATA = 'sensor_data',
+}
+
+/**
+ * Collection priority levels
+ */
+export enum CollectionPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
+}
+
+/**
+ * Trigger condition types
+ */
+export enum TriggerConditionType {
+  TIME_INTERVAL = 'time_interval',
+  KNOWLEDGE_GAP = 'knowledge_gap',
+  PATTERN_DETECTED = 'pattern_detected',
+  THRESHOLD_REACHED = 'threshold_reached',
+  EXTERNAL_EVENT = 'external_event',
+}
+
+/**
+ * Trigger condition for knowledge collection
+ */
+export interface TriggerCondition {
+  type: TriggerConditionType;
+  parameters?: Record<string, any>;
+  intervalMs?: number;
+  lastTriggered?: Date;
+}
+
+/**
+ * Collection configuration
+ */
+export interface CollectionConfiguration {
+  sources?: string[];
+  keywords?: string[];
+  domain?: string;
+  maxItems?: number;
+  knowledgeCountThreshold?: number;
+  apiEndpoints?: Array<{
+    url: string;
+    method?: string;
+    params?: Record<string, any>;
+    name?: string;
+  }>;
+  [key: string]: any;
+}
+
+/**
+ * Knowledge collection task
+ */
+export interface KnowledgeCollectionTask {
+  id: string;
+  name: string;
+  description: string;
+  strategy: CollectionStrategy;
+  priority: CollectionPriority;
+  enabled: boolean;
+  configuration: CollectionConfiguration;
+  triggerConditions: TriggerCondition[];
+  createdAt: Date;
+  lastExecuted?: Date;
+  executionCount: number;
+}
+
+/**
+ * Collection result
+ */
+export interface CollectionResult {
+  success: boolean;
+  itemsCollected: number;
+  knowledgeIds: string[];
+  metadata: Record<string, any>;
+  errors: string[];
+}
+
+/**
+ * Data point for analytics
+ */
+export interface DataPoint {
+  id: string;
+  value: number;
+  timestamp: Date;
+  type: string;
+  metadata?: Record<string, any>;
+}

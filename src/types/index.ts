@@ -23,8 +23,27 @@ export * from './learning.type.js';
 
 // System types and interfaces
 export * from './system.interface.js';
-export * from './system.type.js';
+export {
+  ProcessPriority,
+  ResourceType,
+  ServiceStatus,
+  TaskType,
+} from './system.type.js';
+export type { PerformanceMetrics } from './system.type.js';
 
-// Data Acquisition types and interfaces
+// Data Acquisition types and interfaces - selective exports to avoid conflicts
 export * from './data-acquisition.interface.js';
-export * from './data-acquisition.type.js';
+export {
+  CollectionPriority as DataCollectionPriority,
+  TriggerConditionType,
+} from './data-acquisition.type.js';
+export type {
+  CollectionConfiguration,
+  CollectionResult as DataCollectionResult,
+  KnowledgeCollectionTask as DataKnowledgeCollectionTask,
+  DataPoint,
+  ScrapedContent,
+  SearchQuery,
+  TriggerCondition,
+  TrustedSource,
+} from './data-acquisition.type.js';

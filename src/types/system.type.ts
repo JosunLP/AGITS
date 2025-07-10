@@ -146,3 +146,19 @@ export enum ProcessingStage {
   VALIDATED = 'validated',
   READY = 'ready',
 }
+
+/**
+ * Performance metrics for system monitoring
+ */
+export interface PerformanceMetrics {
+  totalExecutionTime: number;
+  averageResponseTime: number;
+  successRate: number;
+  failureCount: number;
+  requestCount: number;
+  cacheHitRate: number;
+  memoryUsage: number;
+  cpuUsage: number;
+  throughput: number;
+  timestamp: Date;
+}

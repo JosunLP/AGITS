@@ -255,6 +255,7 @@ export class ReasoningEngineService extends TypedEventEmitter<ReasoningEngineEve
       return {
         success: true,
         data: result,
+        timestamp: new Date(),
       };
     } catch (error) {
       this.logger.error('Error processing reasoning task:', error);
