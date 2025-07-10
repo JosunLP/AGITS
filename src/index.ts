@@ -112,7 +112,16 @@ export class AGITSPlatform {
     this.apiController = new APIController(
       this.knowledgeSystem,
       this.autonomousScheduler,
-      this.memorySystem
+      this.memorySystem,
+      {
+        knowledgeCollector: this.knowledgeCollector,
+        chemicalSignaling: this.chemicalSignaling,
+        learningOrchestrator: this.learningOrchestrator,
+        reasoningEngine: this.reasoningEngine,
+        attentionManager: this.attentionManager,
+        decisionEngine: this.decisionEngine,
+        planningService: this.planningService,
+      }
     );
 
     // Register services
@@ -355,7 +364,7 @@ async function main() {
 }
 
 // Start the platform if this file is run directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   main().catch((error) => {
     console.error('Failed to start AGITS Platform:', error);
     process.exit(1);

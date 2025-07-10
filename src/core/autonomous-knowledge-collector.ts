@@ -331,10 +331,16 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
       this.onKnowledgeAdded(knowledge);
     });
 
-    // Listen for data ingestion events
-    this.dataIngestion.on('dataProcessed', (data) => {
-      this.onDataProcessed(data);
-    });
+    // Listen for data ingestion events - safely check if it's an event emitter
+    if (this.dataIngestion && typeof this.dataIngestion.on === 'function') {
+      this.dataIngestion.on('dataProcessed', (data) => {
+        this.onDataProcessed(data);
+      });
+    } else {
+      this.logger.debug(
+        'Data ingestion service does not support events, skipping event listener setup'
+      );
+    }
   }
 
   /**

@@ -854,4 +854,30 @@ export class KnowledgeManagementSystem extends EventEmitter {
 
     return actualRelationships / maxPossibleRelationships;
   }
+
+  /**
+   * Get knowledge item by ID
+   */
+  public getKnowledge(id: string): KnowledgeItem | null {
+    const knowledge = this.knowledgeBase.get(id);
+    if (knowledge) {
+      knowledge.accessCount++;
+      knowledge.lastAccessed = new Date();
+      return knowledge;
+    }
+    return null;
+  }
+
+  /**
+   * Remove knowledge item
+   */
+  public removeKnowledge(id: string): boolean {
+    const exists = this.knowledgeBase.has(id);
+    if (exists) {
+      this.knowledgeBase.delete(id);
+      this.logger.info(`Knowledge item removed: ${id}`);
+      this.emit('knowledgeRemoved', { id });
+    }
+    return exists;
+  }
 }

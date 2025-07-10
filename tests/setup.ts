@@ -11,14 +11,12 @@ global.console = {
   error: jest.fn(),
 };
 
-// Mock timers for autonomous processes
-jest.useFakeTimers();
-
 // Setup test environment
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
 afterEach(() => {
+  // Clean up any timers
   jest.clearAllTimers();
 });

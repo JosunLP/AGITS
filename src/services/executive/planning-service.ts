@@ -32,7 +32,13 @@ export class PlanningService extends EventEmitter {
    * Create a plan for achieving a goal
    */
   public async createPlan(request: PlanningRequest): Promise<Plan> {
-    this.logger.info(`Creating plan for goal: ${request.goal.description}`);
+    this.logger.info(
+      `Creating plan for goal: ${request.goal?.description || request.goal || 'undefined goal'}`
+    );
+
+    if (!request.goal) {
+      throw new Error('Goal is required for plan creation');
+    }
 
     const plan: Plan = {
       id: `plan_${Date.now()}`,

@@ -356,8 +356,10 @@ export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
       memory.strength *= decayFactor;
 
       // Decay connection weights
-      for (const connection of memory.connections) {
-        connection.weight *= decayFactor;
+      if (memory.connections && Array.isArray(memory.connections)) {
+        for (const connection of memory.connections) {
+          connection.weight *= decayFactor;
+        }
       }
     }
   }
