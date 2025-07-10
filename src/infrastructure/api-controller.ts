@@ -2224,9 +2224,7 @@ export class APIController {
       // Try to find an existing task or use a default one
       const taskId = taskType || 'default_task';
 
-      const result = (await this.knowledgeCollector?.triggerCollection?.(
-        taskId
-      )) || {
+      const result = (await this.knowledgeCollector?.triggerCollection?.()) || {
         taskId: `collection_${Date.now()}`,
         type: taskType || 'sensor_data',
         status: 'triggered',
@@ -2234,7 +2232,7 @@ export class APIController {
 
       reply.code(200).send({
         success: true,
-        collectionId: result?.taskId || `collection_${Date.now()}`,
+        collectionId: `collection_${Date.now()}`,
         message: 'Knowledge collection triggered',
       });
     } catch (error) {

@@ -41,10 +41,23 @@ describe('AGITS System Evolution and Autonomous Learning', () => {
         return { success: true };
       }
     })();
+
+    // Create mock services for the collector
+    const mockDataPersistence = {} as any;
+    const mockWebScraping = {} as any;
+    const mockExternalApi = {} as any;
+    const mockLogger = {
+      info: () => {},
+      warn: () => {},
+      error: () => {},
+      debug: () => {},
+    } as any;
+
     knowledgeCollector = new AutonomousKnowledgeCollector(
-      knowledgeSystem,
-      memorySystem,
-      dataIngestionService as any
+      mockDataPersistence,
+      mockWebScraping,
+      mockExternalApi,
+      mockLogger
     );
   });
 

@@ -22,6 +22,8 @@ import { AttentionManager } from './services/cognitive/attention-manager.js';
 import { LearningOrchestrator } from './services/cognitive/learning-orchestrator.js';
 import { ReasoningEngineService } from './services/cognitive/reasoning-engine.js';
 import { NaturalLanguageProcessor } from './services/communication/nlp-service.js';
+import { ExternalApiService } from './services/data-acquisition/external-api.service.js';
+import { WebScrapingService } from './services/data-acquisition/web-scraping.service.js';
 import { DecisionEngine } from './services/executive/decision-engine.js';
 import { PlanningService } from './services/executive/planning-service.js';
 import { DataIngestionService } from './services/sensory/data-ingestion-service.js';
@@ -60,6 +62,8 @@ export class AGITSPlatform {
 
   // Infrastructure
   private persistenceLayer: DataPersistenceLayer;
+  private webScrapingService: WebScrapingService;
+  private externalApiService: ExternalApiService;
 
   constructor() {
     this.logger = new Logger('AGITSPlatform');
@@ -79,6 +83,10 @@ export class AGITSPlatform {
 
     // Initialize persistence layer
     this.persistenceLayer = new DataPersistenceLayer(appConfig.database);
+
+    // Initialize data acquisition services
+    this.webScrapingService = new WebScrapingService();
+    this.externalApiService = new ExternalApiService();
 
     // Initialize core systems
     this.memorySystem = new MemoryManagementSystem(
@@ -117,10 +125,20 @@ export class AGITSPlatform {
     const dataIngestionService = new DataIngestionService();
 
     // Initialize autonomous knowledge collector
-    this.knowledgeCollector = new AutonomousKnowledgeCollector();
+    this.knowledgeCollector = new AutonomousKnowledgeCollector(
+      this.persistenceLayer,
+      this.webScrapingService,
+      this.externalApiService,
+      this.logger
+    );
 
     // Initialize enhanced autonomous knowledge collector
-    this.knowledgeCollector = new AutonomousKnowledgeCollector();
+    this.knowledgeCollector = new AutonomousKnowledgeCollector(
+      this.persistenceLayer,
+      this.webScrapingService,
+      this.externalApiService,
+      this.logger
+    );
 
     // Initialize API controller
     this.apiController = new APIController(
