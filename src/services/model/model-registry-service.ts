@@ -320,9 +320,7 @@ export class ModelRegistryService extends TypedEventEmitter<ModelRegistryEvents>
         return {
           success: false,
           error: modelVersion.error,
-          metadata: {
-            timestamp: new Date().toISOString(),
-            requestId: `deploy-${Date.now()}`,
+          metadata: { timestamp: new Date().toISOString(), requestId: `deploy-${Date.now(), processingTime: 0, version: "1.0.0" }`,
             source: 'ModelRegistryService',
           },
         } as APIResponse<ModelDeployment>;

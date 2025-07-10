@@ -1,6 +1,13 @@
 import { EventEmitter } from 'events';
 import { DataIngestionService } from '../services/sensory/data-ingestion-service.js';
-import { CollectionStrategy, KnowledgeSourceType } from '../types/index.js';
+import {
+  CollectionStrategy,
+  ConfidenceLevel,
+  KnowledgeSourceType,
+  KnowledgeStatus,
+  KnowledgeType,
+  ValidationMethod,
+} from '../types/index.js';
 import { Logger } from '../utils/logger.js';
 import { KnowledgeManagementSystem } from './knowledge-management.js';
 import { MemoryManagementSystem } from './memory-management.js';
@@ -600,12 +607,17 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
           confidenceLevel: 'MEDIUM' as any,
           sources: ['pattern_discovery'],
           tags: ['pattern', 'meta_knowledge', type],
+          status: KnowledgeStatus.PENDING,
           relationships: [],
-          verification: {
+          validation: {
             isVerified: false,
+            verificationMethod: ValidationMethod.AUTOMATIC,
             verificationScore: 0,
             contradictions: [],
             supportingEvidence: [],
+          },
+          verification: {
+            isVerified: false,
           },
           metadata: {
             domain: 'pattern_analysis',
@@ -663,20 +675,28 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
         if (similarity > (task.configuration.similarityThreshold || 0.7)) {
           // Create relationship knowledge
           const relationshipId = await this.knowledgeSystem.addKnowledge({
-            type: 'CONTEXTUAL' as any,
+            type: KnowledgeType.CONTEXTUAL,
             content: {
               relationship: 'similar_to',
               items: [item1.id, item2.id],
               similarity,
             },
-            source: KnowledgeSourceType.CROSS_REFERENCE, // Add required source field
+            source: KnowledgeSourceType.CROSS_REFERENCE,
             subject: `Relationship: ${item1.subject} ↔ ${item2.subject}`,
             description: `Discovered similarity between knowledge items`,
             confidence: similarity,
-            confidenceLevel: 'HIGH' as any,
+            confidenceLevel: ConfidenceLevel.HIGH,
             sources: ['cross_reference'],
             tags: ['relationship', 'meta_knowledge'],
+            status: KnowledgeStatus.PENDING,
             relationships: [],
+            validation: {
+              isVerified: false,
+              verificationMethod: ValidationMethod.AUTOMATIC,
+              verificationScore: similarity,
+              contradictions: [],
+              supportingEvidence: ['similarity_calculation'],
+            },
             verification: {
               isVerified: false,
               verificationMethod: 'automatic',
@@ -732,23 +752,38 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
     };
 
     const knowledgeId = await this.knowledgeSystem.addKnowledge({
-      type: 'FACTUAL' as any,
+      type: KnowledgeType.FACTUAL,
       content: { systemStats, source: 'sensor_data' },
-      source: KnowledgeSourceType.SENSOR_DATA, // Add required source field
+      source: KnowledgeSourceType.SENSOR_DATA,
       subject: 'System Performance Data',
       description: `System performance snapshot at ${new Date().toISOString()}`,
       confidence: 0.9,
-      confidenceLevel: 'VERY_HIGH' as any,
+      confidenceLevel: ConfidenceLevel.VERY_HIGH,
       sources: ['system_sensors'],
       tags: ['system', 'performance', 'sensor_data'],
+      status: KnowledgeStatus.VALIDATED,
       relationships: [],
-      verification: {
+      validation: {
         isVerified: true,
+        verificationMethod: ValidationMethod.EMPIRICAL_TEST,
         verificationScore: 0.9,
         contradictions: [],
         supportingEvidence: ['direct_measurement'],
       },
+      verification: {
+        isVerified: true,
+      },
       metadata: {
+        domain: 'system_monitoring',
+        complexity: 0.2,
+        importance: 0.8,
+        frequency: 1,
+        context: { task: task.id },
+        derivedFrom: [],
+        relatedConcepts: ['performance', 'monitoring'],
+        applications: ['system_analysis'],
+        limitations: ['point_in_time'],
+        assumptions: ['current_state_representative'],
         sensorType: 'system_performance',
         collectedAt: new Date(),
         sourceTask: task.id,

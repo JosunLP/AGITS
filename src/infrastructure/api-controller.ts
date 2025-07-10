@@ -11,8 +11,10 @@ import { NaturalLanguageProcessor } from '../services/communication/nlp-service.
 import { DecisionEngine } from '../services/executive/decision-engine.js';
 import { PlanningService } from '../services/executive/planning-service.js';
 import {
+  ConsolidationPhase,
   LearningExperience,
   LearningType,
+  MemoryPriority,
   MemoryType,
 } from '../types/index.js';
 import { Logger } from '../utils/logger.js';
@@ -347,11 +349,19 @@ export class APIController {
         sources: knowledgeData.sources || ['api'],
         tags: knowledgeData.tags || [],
         relationships: knowledgeData.relationships || [],
+        status: knowledgeData.status || 'active',
         verification: knowledgeData.verification || {
           status: 'pending',
           verifiedAt: null,
           verifiedBy: null,
           method: 'none',
+        },
+        validation: knowledgeData.validation || {
+          isValid: true,
+          validatedAt: new Date(),
+          validatedBy: 'system',
+          validationMethod: 'automatic',
+          confidence: 0.8,
         },
         metadata: knowledgeData.metadata || {},
       };
@@ -914,6 +924,9 @@ export class APIController {
           source: 'api',
           confidence: memoryData.confidence || memoryData.importance || 0.8,
           ...memoryData.metadata,
+          requestId: `req_${Date.now()}`,
+          processingTime: 0,
+          version: '1.0.0',
         },
         synapticStrength:
           memoryData.synapticStrength || memoryData.importance || 0.5,
@@ -998,6 +1011,12 @@ export class APIController {
           confidence: experience.confidence || 0.5,
           timestamp: new Date(),
           context: experience.context || {},
+          metadata: experience.metadata || {
+            sessionId: `session_${Date.now()}`,
+            modelVersion: '1.0.0',
+            environment: 'api',
+            experimentGroup: 'default',
+          },
         };
 
         result =
@@ -1207,9 +1226,25 @@ export class APIController {
         },
         connections: [],
         strength: 0.7,
+        createdAt: new Date(),
+        priority: MemoryPriority.NORMAL,
+        decayRate: 0.1,
+        consolidationLevel: 0.5,
         metadata: {
           conversationType: 'chat',
           source: 'api',
+          tags: ['conversation', 'chat'],
+          category: 'communication',
+          importance: 0.7,
+          emotionalValence: 0.0,
+          contextualRelevance: 0.8,
+          temporalContext: 'recent',
+          confidence: 0.8,
+          qualityScore: 0.8,
+          lastUpdated: new Date(),
+          validationStatus: 'pending',
+          consolidationPhase: ConsolidationPhase.ENCODING,
+          associatedGoals: [],
         },
       });
 
@@ -1235,12 +1270,33 @@ export class APIController {
             targetId: await conversationMemory,
             type: 'conversational' as any,
             weight: 0.8,
+            strength: 0.7,
+            lastActivated: new Date(),
+            activationCount: 1,
+            bidirectional: false,
+            metadata: {},
           },
         ],
         strength: 0.7,
+        createdAt: new Date(),
+        priority: MemoryPriority.NORMAL,
+        decayRate: 0.1,
+        consolidationLevel: 0.5,
         metadata: {
           conversationType: 'chat_response',
           source: 'ai',
+          tags: ['conversation', 'chat', 'response'],
+          category: 'communication',
+          importance: 0.7,
+          emotionalValence: 0.0,
+          contextualRelevance: 0.8,
+          temporalContext: 'recent',
+          confidence: 0.8,
+          qualityScore: 0.8,
+          lastUpdated: new Date(),
+          validationStatus: 'pending',
+          consolidationPhase: ConsolidationPhase.ENCODING,
+          associatedGoals: [],
         },
       });
 
@@ -1279,6 +1335,12 @@ export class APIController {
         environment: context || {},
         goals: [],
         constraints: [],
+        metadata: {
+          timestamp: new Date(),
+          source: 'api',
+          version: '1.0.0',
+          contextType: 'conversation',
+        },
       };
 
       const nlpResult = await this.nlpService.processText(
@@ -1501,6 +1563,12 @@ export class APIController {
             },
             goals: [],
             constraints: [],
+            metadata: {
+              timestamp: new Date(),
+              source: 'api',
+              version: '1.0.0',
+              contextType: 'decision',
+            },
           },
           priority: priority || 1,
           timeout: 30000,
@@ -1569,6 +1637,12 @@ export class APIController {
           },
           goals: goals || [],
           constraints: constraints || [],
+          metadata: {
+            timestamp: new Date(),
+            source: 'api',
+            version: '1.0.0',
+            contextType: 'complex_decision',
+          },
         },
         priority: 1,
         timeout: 30000,
@@ -1632,6 +1706,12 @@ export class APIController {
           environment: {},
           goals: [],
           constraints: constraints || [],
+          metadata: {
+            timestamp: new Date(),
+            source: 'api',
+            version: '1.0.0',
+            contextType: 'planning',
+          },
         },
       };
 

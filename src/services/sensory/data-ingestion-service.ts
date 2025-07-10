@@ -1,8 +1,9 @@
 import {
   APIResponse,
-  DataModality,
+  DataModalityInput,
   ModalityType,
   MultiModalData,
+  ProcessedDataModality,
   ProcessingStage,
 } from '../../types/index.js';
 import { EventMap, TypedEventEmitter } from '../../utils/event-emitter';
@@ -69,6 +70,7 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
           error: {
             code: 'QUEUE_FULL',
             message: 'Ingestion queue is full, please try again later',
+            timestamp: new Date(),
           },
         };
       }
@@ -95,6 +97,9 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
           timestamp: new Date().toISOString(),
           queuePosition: this.ingestionQueue.size,
           estimatedProcessingTime: task.estimatedProcessingTime,
+          requestId: `req_${Date.now()}`,
+          processingTime: 0,
+          version: '1.0.0',
         },
       };
     } catch (error) {
@@ -105,6 +110,7 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
           code: 'INGESTION_ERROR',
           message:
             error instanceof Error ? error.message : 'Unknown ingestion error',
+          timestamp: new Date(),
         },
       };
     }
@@ -124,6 +130,7 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
           error: {
             code: 'STREAM_EXISTS',
             message: `Stream ${streamId} is already active`,
+            timestamp: new Date(),
           },
         };
       }
@@ -152,6 +159,7 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
           code: 'STREAM_START_ERROR',
           message:
             error instanceof Error ? error.message : 'Unknown stream error',
+          timestamp: new Date(),
         },
       };
     }
@@ -169,6 +177,7 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
           error: {
             code: 'STREAM_NOT_FOUND',
             message: `Stream ${streamId} not found`,
+            timestamp: new Date(),
           },
         };
       }
@@ -192,6 +201,7 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
           code: 'STREAM_STOP_ERROR',
           message:
             error instanceof Error ? error.message : 'Unknown stream error',
+          timestamp: new Date(),
         },
       };
     }
@@ -285,7 +295,7 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
    * Process specific modality data
    */
   private async processModalityData(
-    modality: DataModality
+    modality: DataModalityInput
   ): Promise<ProcessedDataModality> {
     const startTime = Date.now();
 
@@ -315,14 +325,20 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
     }
 
     return {
-      original: modality,
-      processed,
+      id: `mod_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
       type: modality.type,
-      processingTime: Date.now() - startTime,
-      confidence: 0.8, // Default confidence
+      data: processed,
+      quality: 0.8,
+      timestamp: new Date(),
       metadata: {
         processingMethod: this.getProcessingMethod(modality.type),
         qualityScore: 0.9,
+        processingTime: Date.now() - startTime,
+        confidence: 0.8,
+      },
+      original: {
+        data: modality.data,
+        size: this.calculateDataSize(modality.data),
       },
     };
   }
@@ -443,7 +459,7 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
     let totalTime = 0;
 
     for (const modality of data.modalities) {
-      const rate = this.processingRates.get(modality.type) || 1;
+      const rate = this.processingRates.get(modality.type as ModalityType) || 1;
       const size = this.getModalitySize(modality);
       totalTime += (size / rate) * 1000; // Convert to milliseconds
     }
@@ -454,7 +470,7 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
   /**
    * Get modality data size
    */
-  private getModalitySize(modality: DataModality): number {
+  private getModalitySize(modality: ProcessedDataModality): number {
     // Estimate size based on modality type
     switch (modality.type) {
       case ModalityType.TEXT:
@@ -480,11 +496,17 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
   private getProcessingMethod(type: ModalityType): string {
     const methods = {
       [ModalityType.TEXT]: 'nlp_pipeline',
+      [ModalityType.TEXTUAL]: 'nlp_pipeline',
       [ModalityType.IMAGE]: 'computer_vision',
+      [ModalityType.VISUAL]: 'computer_vision',
       [ModalityType.AUDIO]: 'audio_analysis',
+      [ModalityType.AUDITORY]: 'audio_analysis',
       [ModalityType.VIDEO]: 'video_analysis',
       [ModalityType.SENSOR]: 'signal_processing',
+      [ModalityType.SENSORY]: 'signal_processing',
       [ModalityType.STRUCTURED]: 'data_validation',
+      [ModalityType.TEMPORAL]: 'time_series_analysis',
+      [ModalityType.SPATIAL]: 'spatial_analysis',
     };
     return methods[type] || 'generic';
   }
@@ -494,7 +516,7 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
    */
   private calculateTotalSize(modalities: ProcessedDataModality[]): number {
     return modalities.reduce((total, modality) => {
-      return total + (modality.original.data?.size || 1000);
+      return total + (modality.original?.data?.size || 1000);
     }, 0);
   }
 
@@ -516,7 +538,7 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
   private calculateConfidence(modalities: ProcessedDataModality[]): number {
     const avgConfidence =
       modalities.reduce((sum, modality) => {
-        return sum + modality.confidence;
+        return sum + (modality.quality || 0.8);
       }, 0) / modalities.length;
 
     return avgConfidence;
@@ -564,6 +586,25 @@ export class DataIngestionService extends TypedEventEmitter<DataIngestionEvents>
     };
   }
 
+  /**
+   * Calculate the size of data
+   */
+  private calculateDataSize(data: any): number {
+    if (typeof data === 'string') {
+      return data.length;
+    }
+    if (data instanceof ArrayBuffer) {
+      return data.byteLength;
+    }
+    if (Array.isArray(data)) {
+      return data.length;
+    }
+    if (typeof data === 'object' && data !== null) {
+      return JSON.stringify(data).length;
+    }
+    return 1000; // Default size
+  }
+
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => {
       (globalThis as any).setTimeout(resolve, ms);
@@ -593,7 +634,7 @@ interface IngestionTask {
   createdAt: Date;
   processingStartTime?: Date;
   completedAt?: Date;
-  modalities: DataModality[];
+  modalities: DataModalityInput[];
   priority: number;
   estimatedProcessingTime: number;
   result?: ProcessedMultiModalData;
@@ -630,18 +671,6 @@ interface ProcessedMultiModalData {
     totalSize: number;
     quality: number;
     confidence: number;
-  };
-}
-
-interface ProcessedDataModality {
-  original: DataModality;
-  processed: any;
-  type: ModalityType;
-  processingTime: number;
-  confidence: number;
-  metadata: {
-    processingMethod: string;
-    qualityScore: number;
   };
 }
 

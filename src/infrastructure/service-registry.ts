@@ -44,7 +44,7 @@ export class ServiceRegistry extends EventEmitter {
       status: ServiceStatus.HEALTHY,
       lastHeartbeat: new Date(),
       metrics: this.getDefaultMetrics(),
-      errors: [],
+      errors: [], uptime: 0, version: "1.0.0", dependencies: [],
     });
 
     this.logger.info(`Service registered: ${name}`);

@@ -1,7 +1,12 @@
 import { EventEmitter } from 'events';
 import { LearningConfig } from '../config/app.js';
 import { DataPersistenceLayer } from '../infrastructure/data-persistence-layer.js';
-import { KnowledgeItem, KnowledgeRelationship } from '../types/index.js';
+import {
+  KnowledgeItem,
+  KnowledgeRelationship,
+  KnowledgeStatus,
+  ValidationMethod,
+} from '../types/index.js';
 import { Logger } from '../utils/logger.js';
 import { MemoryManagementSystem } from './memory-management.js';
 
@@ -502,7 +507,7 @@ export class KnowledgeManagementSystem extends EventEmitter {
         0
       ),
       verificationRate:
-        items.filter((item) => item.verification.isVerified).length /
+        items.filter((item) => item.verification?.isVerified || false).length /
         Math.max(items.length, 1),
       recentlyUpdated: items.filter(
         (item) => Date.now() - item.updatedAt.getTime() < 24 * 60 * 60 * 1000
@@ -575,14 +580,29 @@ export class KnowledgeManagementSystem extends EventEmitter {
         confidenceLevel: this.calculateConfidenceLevel(memory.strength || 0.5),
         sources: [memory.id],
         tags: this.extractTags(memory),
+        status: KnowledgeStatus.PENDING,
         relationships: [],
-        verification: {
+        validation: {
           isVerified: false,
+          verificationMethod: ValidationMethod.AUTOMATIC,
           verificationScore: 0,
           contradictions: [],
           supportingEvidence: [],
         },
+        verification: {
+          isVerified: false,
+        },
         metadata: {
+          domain: 'memory_extraction',
+          complexity: 0.5,
+          importance: memory.strength || 0.5,
+          frequency: 1,
+          context: { extractedAt: new Date() },
+          derivedFrom: [memory.id],
+          relatedConcepts: [],
+          applications: ['knowledge_synthesis'],
+          limitations: ['memory_accuracy'],
+          assumptions: ['memory_content_valid'],
           memoryId: memory.id,
           memoryType: memory.type,
           extractedAt: new Date(),

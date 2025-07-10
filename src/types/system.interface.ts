@@ -348,9 +348,16 @@ export interface RateLimitInfo {
   window: number;
 }
 
+export interface DataModalityInput {
+  type: string;
+  data: any;
+  quality?: number;
+  metadata?: Record<string, any>;
+}
+
 export interface MultiModalData {
   id: string;
-  modalities: DataModality[];
+  modalities: ProcessedDataModality[];
   primaryModality: string;
   timestamp: Date;
   metadata: Record<string, any>;
@@ -359,7 +366,7 @@ export interface MultiModalData {
   features?: Record<string, any>;
 }
 
-export interface DataModality {
+export interface ProcessedDataModality {
   id: string;
   type: string;
   data: any;

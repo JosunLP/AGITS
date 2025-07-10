@@ -1,4 +1,4 @@
-import { APIResponse, DataModality, ModalityType } from '../../types/index.js';
+import { APIResponse, DataModalityInput, ModalityType } from '../../types/index.js';
 import { EventMap, TypedEventEmitter } from '../../utils/event-emitter.js';
 import { Logger } from '../../utils/logger.js';
 
@@ -98,7 +98,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
    * Recognize patterns in data
    */
   public async recognizePatterns(
-    data: DataModality[],
+    data: DataModalityInput[],
     options?: RecognitionOptions
   ): Promise<APIResponse<RecognitionResult[]>> {
     try {
@@ -140,6 +140,9 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
           taskId,
           queuePosition: this.recognitionQueue.size,
           selectedModels: task.modelIds,
+          requestId: `req_${Date.now()}`,
+          processingTime: 0,
+          version: "1.0.0"
         },
       };
     } catch (error) {
@@ -171,7 +174,10 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
           success: false,
           error: {
             code: 'MODEL_NOT_FOUND',
-            message: `Model ${modelId} not found`,
+            message: `Model ${modelId,
+            timestamp: new Date()
+          } not found`,
+            timestamp: new Date()
           },
         };
       }
@@ -221,8 +227,11 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
       return {
         success: false,
         error: {
-          code: 'MODEL_NOT_FOUND',
-          message: `Model ${modelId} not found`,
+            code: 'MODEL_NOT_FOUND',
+            message: `Model ${modelId,
+            timestamp: new Date()
+          } not found`,
+            timestamp: new Date()
         },
       };
     }
@@ -271,7 +280,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
         if (!model) continue;
 
         const relevantData = task.data.filter((d) =>
-          model.modalities.includes(d.type)
+          model.modalities.includes(d.type as ModalityType)
         );
 
         if (relevantData.length === 0) continue;
@@ -322,7 +331,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
   /**
    * Select appropriate models for data
    */
-  private selectAppropriateModels(data: DataModality[]): string[] {
+  private selectAppropriateModels(data: DataModalityInput[]): string[] {
     const modalityTypes = new Set(data.map((d) => d.type));
     const selectedModels: string[] = [];
 
@@ -343,7 +352,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
    */
   private async performRecognition(
     model: PatternModel,
-    data: DataModality[],
+    data: DataModalityInput[],
     options: RecognitionOptions
   ): Promise<RecognitionResult> {
     const startTime = Date.now();
@@ -392,7 +401,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
    * Recognize objects in visual data
    */
   private async recognizeObjects(
-    data: DataModality[],
+    data: DataModalityInput[],
     model: PatternModel
   ): Promise<DetectedPattern[]> {
     await this.sleep(100); // Simulate processing time
@@ -441,7 +450,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
    * Recognize speech patterns in audio data
    */
   private async recognizeSpeech(
-    data: DataModality[],
+    data: DataModalityInput[],
     model: PatternModel
   ): Promise<DetectedPattern[]> {
     await this.sleep(200); // Simulate processing time
@@ -477,7 +486,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
    * Recognize behavior patterns in structured/sensor data
    */
   private async recognizeBehavior(
-    data: DataModality[],
+    data: DataModalityInput[],
     model: PatternModel
   ): Promise<DetectedPattern[]> {
     await this.sleep(150); // Simulate processing time
@@ -512,7 +521,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
    * Recognize text patterns
    */
   private async recognizeTextPatterns(
-    data: DataModality[],
+    data: DataModalityInput[],
     model: PatternModel
   ): Promise<DetectedPattern[]> {
     await this.sleep(50); // Simulate processing time
@@ -550,7 +559,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
    * Recognize motion patterns
    */
   private async recognizeMotion(
-    data: DataModality[],
+    data: DataModalityInput[],
     model: PatternModel
   ): Promise<DetectedPattern[]> {
     await this.sleep(120); // Simulate processing time
@@ -589,7 +598,7 @@ export class PatternRecognitionService extends TypedEventEmitter<PatternRecognit
    * Recognize generic patterns
    */
   private async recognizeGenericPatterns(
-    data: DataModality[],
+    data: DataModalityInput[],
     model: PatternModel
   ): Promise<DetectedPattern[]> {
     await this.sleep(80); // Simulate processing time
@@ -732,7 +741,7 @@ interface PatternModel {
 
 interface RecognitionTask {
   id: string;
-  data: DataModality[];
+  data: DataModalityInput[];
   options: RecognitionOptions;
   status: RecognitionStatus;
   createdAt: Date;
@@ -788,7 +797,7 @@ interface DetectedPattern {
 }
 
 interface TrainingData {
-  input: DataModality;
+  input: DataModalityInput;
   expectedOutput: DetectedPattern[];
   metadata?: Record<string, any>;
 }

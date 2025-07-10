@@ -69,7 +69,7 @@ export class LearningOrchestrator extends TypedEventEmitter<LearningEvents> {
           reward: memory.metadata.reward,
           confidence: memory.strength,
           timestamp: memory.lastAccessed,
-          context: memory.content.context || {},
+          context: memory.content.context || {, metadata: {} },
         },
         priority: memory.metadata.reward > 0 ? 1 : 0.5,
         createdAt: new Date(),

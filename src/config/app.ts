@@ -372,6 +372,10 @@ export class AppConfig {
         storage: process.env.STORAGE_LIMIT || '1Gi',
         network: process.env.NETWORK_LIMIT || '100Mbps',
       },
+      enabled: true,
+      instances: 1,
+      healthCheckPath: '/health',
+      config: {},
       monitoring: {
         metricsEnabled: this.monitoring.prometheusEnabled,
         tracingEnabled: this.monitoring.tracingEnabled,

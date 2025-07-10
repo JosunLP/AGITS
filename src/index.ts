@@ -224,7 +224,11 @@ export class AGITSPlatform {
     this.memorySystem.on('memoryConsolidated', (memory) => {
       // TODO: Adapt to enhanced ReasoningEngine API
       // this.reasoningEngine.onMemoryConsolidated(memory);
-      this.logger.debug('Memory consolidated:', memory.id);
+      this.logger.debug(
+        'Memory consolidated:',
+        memory.consolidatedMemories.length,
+        'memories'
+      );
     });
 
     // Chemical signaling events
