@@ -12,6 +12,9 @@ export interface DatabaseConfig {
       learningExperiences: string;
       patterns: string;
       metrics: string;
+      webScrapedContent: string;
+      knowledgeSources: string;
+      webCache: string;
     };
     options: {
       maxPoolSize: number;
@@ -65,6 +68,9 @@ export const defaultDatabaseConfig = {
       learningExperiences: 'learning_experiences',
       patterns: 'patterns',
       metrics: 'metrics',
+      webScrapedContent: 'web_scraped_content',
+      knowledgeSources: 'knowledge_sources',
+      webCache: 'web_cache',
     },
     options: {
       maxPoolSize: 10,

@@ -6,6 +6,49 @@ import { KnowledgeItem, MemoryNode } from '../types/index.js';
 import { Logger } from '../utils/logger.js';
 
 /**
+ * Web-scraped content storage interface
+ */
+interface WebScrapedContent {
+  id: string;
+  url: string;
+  domain: string;
+  title: string;
+  content: string;
+  author?: string;
+  publishDate?: Date;
+  scrapedAt: Date;
+  credibilityScore: number;
+  qualityScore: number;
+  relevanceScore: number;
+  sourceId: string;
+  sourceName: string;
+  tags: string[];
+  language: string;
+  metadata: Record<string, any>;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+/**
+ * Knowledge source tracking
+ */
+interface KnowledgeSource {
+  id: string;
+  name: string;
+  domain: string;
+  credibilityScore: number;
+  successRate: number;
+  totalRequests: number;
+  lastAccessed: Date;
+  categories: string[];
+  rateLimit: number;
+  isActive: boolean;
+  metadata: Record<string, any>;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+/**
  * Data Persistence Layer - Manages all database operations for AGITS
  * Provides unified interface for MongoDB, Neo4j, and Redis operations
  */
@@ -23,6 +66,11 @@ export class DataPersistenceLayer {
   private learningExperiencesCollection: Collection | null = null;
   private patternsCollection: Collection | null = null;
   private metricsCollection: Collection | null = null;
+  // New web-related collections
+  private webScrapedContentCollection: Collection<WebScrapedContent> | null =
+    null;
+  private knowledgeSourcesCollection: Collection<KnowledgeSource> | null = null;
+  private webCacheCollection: Collection | null = null;
 
   constructor(config: DatabaseConfig) {
     this.config = config;
@@ -77,6 +125,15 @@ export class DataPersistenceLayer {
       );
       this.metricsCollection = this.mongodb.collection(
         this.config.mongodb.collections.metrics
+      );
+      this.webScrapedContentCollection = this.mongodb.collection(
+        this.config.mongodb.collections.webScrapedContent
+      );
+      this.knowledgeSourcesCollection = this.mongodb.collection(
+        this.config.mongodb.collections.knowledgeSources
+      );
+      this.webCacheCollection = this.mongodb.collection(
+        this.config.mongodb.collections.webCache
       );
 
       this.logger.info('MongoDB connection established');
@@ -159,6 +216,23 @@ export class DataPersistenceLayer {
       await this.knowledgeCollection.createIndex({ confidence: -1 });
       await this.knowledgeCollection.createIndex({ lastAccessed: -1 });
       await this.knowledgeCollection.createIndex({ subject: 'text' });
+
+      // Web-scraped content indexes
+      await this.webScrapedContentCollection?.createIndex(
+        { id: 1 },
+        { unique: true }
+      );
+      await this.webScrapedContentCollection?.createIndex({ url: 1 });
+      await this.webScrapedContentCollection?.createIndex({ domain: 1 });
+      await this.webScrapedContentCollection?.createIndex({ scrapedAt: -1 });
+
+      // Knowledge sources indexes
+      await this.knowledgeSourcesCollection?.createIndex(
+        { id: 1 },
+        { unique: true }
+      );
+      await this.knowledgeSourcesCollection?.createIndex({ domain: 1 });
+      await this.knowledgeSourcesCollection?.createIndex({ lastAccessed: -1 });
 
       this.logger.info('Database indexes created successfully');
     } catch (error) {
@@ -535,5 +609,331 @@ export class DataPersistenceLayer {
     }
 
     return health;
+  }
+
+  /**
+   * Store web scraped content
+   */
+  async storeWebScrapedContent(content: WebScrapedContent): Promise<string> {
+    if (!this.webScrapedContentCollection) {
+      throw new Error('Web scraped content collection not initialized');
+    }
+
+    try {
+      const result = await this.webScrapedContentCollection.insertOne({
+        ...content,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      this.logger.debug(`Stored web scraped content: ${content.id}`);
+      return result.insertedId.toString();
+    } catch (error) {
+      this.logger.error('Failed to store web scraped content:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get web scraped content by URL
+   */
+  async getWebScrapedContentByUrl(
+    url: string
+  ): Promise<WebScrapedContent | null> {
+    if (!this.webScrapedContentCollection) {
+      throw new Error('Web scraped content collection not initialized');
+    }
+
+    try {
+      const content = await this.webScrapedContentCollection.findOne({ url });
+      return content as WebScrapedContent | null;
+    } catch (error) {
+      this.logger.error('Failed to get web scraped content by URL:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Search web scraped content
+   */
+  async searchWebScrapedContent(query: {
+    keywords?: string[];
+    domains?: string[];
+    sources?: string[];
+    minCredibility?: number;
+    dateRange?: { from: Date; to: Date };
+    limit?: number;
+  }): Promise<WebScrapedContent[]> {
+    if (!this.webScrapedContentCollection) {
+      throw new Error('Web scraped content collection not initialized');
+    }
+
+    try {
+      const filter: any = {};
+
+      if (query.keywords && query.keywords.length > 0) {
+        filter.$text = { $search: query.keywords.join(' ') };
+      }
+
+      if (query.domains && query.domains.length > 0) {
+        filter.domain = { $in: query.domains };
+      }
+
+      if (query.sources && query.sources.length > 0) {
+        filter.sourceId = { $in: query.sources };
+      }
+
+      if (query.minCredibility !== undefined) {
+        filter.credibilityScore = { $gte: query.minCredibility };
+      }
+
+      if (query.dateRange) {
+        filter.scrapedAt = {
+          $gte: query.dateRange.from,
+          $lte: query.dateRange.to,
+        };
+      }
+
+      const cursor = this.webScrapedContentCollection
+        .find(filter)
+        .sort({ scrapedAt: -1 });
+
+      if (query.limit) {
+        cursor.limit(query.limit);
+      }
+
+      return (await cursor.toArray()) as WebScrapedContent[];
+    } catch (error) {
+      this.logger.error('Failed to search web scraped content:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Store or update knowledge source
+   */
+  async storeKnowledgeSource(source: KnowledgeSource): Promise<void> {
+    if (!this.knowledgeSourcesCollection) {
+      throw new Error('Knowledge sources collection not initialized');
+    }
+
+    try {
+      await this.knowledgeSourcesCollection.replaceOne(
+        { id: source.id },
+        { ...source, updatedAt: new Date() },
+        { upsert: true }
+      );
+
+      this.logger.debug(`Stored/updated knowledge source: ${source.id}`);
+    } catch (error) {
+      this.logger.error('Failed to store knowledge source:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all active knowledge sources
+   */
+  async getActiveKnowledgeSources(): Promise<KnowledgeSource[]> {
+    if (!this.knowledgeSourcesCollection) {
+      throw new Error('Knowledge sources collection not initialized');
+    }
+
+    try {
+      return (await this.knowledgeSourcesCollection
+        .find({ isActive: true })
+        .sort({ credibilityScore: -1 })
+        .toArray()) as KnowledgeSource[];
+    } catch (error) {
+      this.logger.error('Failed to get active knowledge sources:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update knowledge source statistics
+   */
+  async updateKnowledgeSourceStats(
+    sourceId: string,
+    stats: {
+      successRate?: number;
+      totalRequests?: number;
+      lastAccessed?: Date;
+      credibilityScore?: number;
+    }
+  ): Promise<void> {
+    if (!this.knowledgeSourcesCollection) {
+      throw new Error('Knowledge sources collection not initialized');
+    }
+
+    try {
+      const updateDoc: any = { updatedAt: new Date() };
+
+      if (stats.successRate !== undefined)
+        updateDoc.successRate = stats.successRate;
+      if (stats.totalRequests !== undefined)
+        updateDoc.totalRequests = stats.totalRequests;
+      if (stats.lastAccessed !== undefined)
+        updateDoc.lastAccessed = stats.lastAccessed;
+      if (stats.credibilityScore !== undefined)
+        updateDoc.credibilityScore = stats.credibilityScore;
+
+      await this.knowledgeSourcesCollection.updateOne(
+        { id: sourceId },
+        { $set: updateDoc }
+      );
+
+      this.logger.debug(`Updated knowledge source stats: ${sourceId}`);
+    } catch (error) {
+      this.logger.error('Failed to update knowledge source stats:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Cache web content with TTL
+   */
+  async cacheWebContent(
+    key: string,
+    content: any,
+    ttlSeconds: number = 3600
+  ): Promise<void> {
+    if (!this.redis) {
+      this.logger.warn('Redis not available for web content caching');
+      return;
+    }
+
+    try {
+      const cacheKey = `webcache:${key}`;
+      await this.redis.setex(cacheKey, ttlSeconds, JSON.stringify(content));
+      this.logger.debug(`Cached web content with key: ${cacheKey}`);
+    } catch (error) {
+      this.logger.error('Failed to cache web content:', error);
+    }
+  }
+
+  /**
+   * Get cached web content
+   */
+  async getCachedWebContent(key: string): Promise<any | null> {
+    if (!this.redis) {
+      return null;
+    }
+
+    try {
+      const cacheKey = `webcache:${key}`;
+      const cached = await this.redis.get(cacheKey);
+
+      if (cached) {
+        this.logger.debug(`Retrieved cached web content: ${cacheKey}`);
+        return JSON.parse(cached);
+      }
+
+      return null;
+    } catch (error) {
+      this.logger.error('Failed to get cached web content:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Store web scraping session data
+   */
+  async storeWebScrapingSession(
+    sessionId: string,
+    data: {
+      query: any;
+      results: number;
+      sources: string[];
+      startTime: Date;
+      endTime: Date;
+      errors?: string[];
+    }
+  ): Promise<void> {
+    if (!this.webCacheCollection) {
+      throw new Error('Web cache collection not initialized');
+    }
+
+    try {
+      await this.webCacheCollection.insertOne({
+        sessionId,
+        type: 'scraping_session',
+        ...data,
+        createdAt: new Date(),
+      });
+
+      this.logger.debug(`Stored web scraping session: ${sessionId}`);
+    } catch (error) {
+      this.logger.error('Failed to store web scraping session:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get web scraping statistics
+   */
+  async getWebScrapingStats(): Promise<{
+    totalScrapedContent: number;
+    contentBySource: Array<{ sourceId: string; count: number }>;
+    contentByDomain: Array<{ domain: string; count: number }>;
+    avgCredibilityScore: number;
+    recentSessions: number;
+  }> {
+    if (!this.webScrapedContentCollection || !this.webCacheCollection) {
+      throw new Error('Web collections not initialized');
+    }
+
+    try {
+      const [
+        totalContent,
+        contentBySource,
+        contentByDomain,
+        avgCredibility,
+        recentSessions,
+      ] = await Promise.all([
+        this.webScrapedContentCollection.countDocuments(),
+        this.webScrapedContentCollection
+          .aggregate([
+            { $group: { _id: '$sourceId', count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 10 },
+          ])
+          .toArray(),
+        this.webScrapedContentCollection
+          .aggregate([
+            { $group: { _id: '$domain', count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 10 },
+          ])
+          .toArray(),
+        this.webScrapedContentCollection
+          .aggregate([
+            { $group: { _id: null, avg: { $avg: '$credibilityScore' } } },
+          ])
+          .toArray(),
+        this.webCacheCollection.countDocuments({
+          type: 'scraping_session',
+          createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+        }),
+      ]);
+
+      return {
+        totalScrapedContent: totalContent,
+        contentBySource: contentBySource.map((item: any) => ({
+          sourceId: item._id,
+          count: item.count,
+        })),
+        contentByDomain: contentByDomain.map((item: any) => ({
+          domain: item._id,
+          count: item.count,
+        })),
+        avgCredibilityScore:
+          avgCredibility.length > 0 ? avgCredibility[0].avg : 0,
+        recentSessions,
+      };
+    } catch (error) {
+      this.logger.error('Failed to get web scraping stats:', error);
+      throw error;
+    }
   }
 }

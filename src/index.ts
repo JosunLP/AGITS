@@ -15,6 +15,7 @@ import { Logger } from './utils/logger.js';
 import { AutonomousKnowledgeCollector } from './core/autonomous-knowledge-collector.js';
 import { AutonomousProcessScheduler } from './core/autonomous-scheduler.js';
 import { ChemicalSignalingSystem } from './core/chemical-signaling.js';
+import { EnhancedAutonomousKnowledgeCollector } from './core/enhanced-autonomous-knowledge-collector.js';
 import { KnowledgeManagementSystem } from './core/knowledge-management.js';
 import { MemoryManagementSystem } from './core/memory-management.js';
 import { DataPersistenceLayer } from './infrastructure/data-persistence-layer.js';
@@ -42,6 +43,7 @@ export class AGITSPlatform {
   private autonomousScheduler: AutonomousProcessScheduler;
   private knowledgeSystem: KnowledgeManagementSystem;
   private knowledgeCollector: AutonomousKnowledgeCollector;
+  private enhancedKnowledgeCollector: EnhancedAutonomousKnowledgeCollector;
 
   // Cognitive services
   private reasoningEngine: ReasoningEngineService;
@@ -126,6 +128,14 @@ export class AGITSPlatform {
       dataIngestionService
     );
 
+    // Initialize enhanced autonomous knowledge collector
+    this.enhancedKnowledgeCollector = new EnhancedAutonomousKnowledgeCollector(
+      this.knowledgeSystem,
+      this.memorySystem,
+      dataIngestionService,
+      this.persistenceLayer
+    );
+
     // Initialize API controller
     this.apiController = new APIController(
       this.knowledgeSystem,
@@ -133,6 +143,7 @@ export class AGITSPlatform {
       this.memorySystem,
       {
         knowledgeCollector: this.knowledgeCollector,
+        enhancedKnowledgeCollector: this.enhancedKnowledgeCollector,
         chemicalSignaling: this.chemicalSignaling,
         learningOrchestrator: this.learningOrchestrator,
         reasoningEngine: this.reasoningEngine,
@@ -305,6 +316,9 @@ export class AGITSPlatform {
 
     // Start autonomous knowledge collection
     this.knowledgeCollector.start();
+
+    // Start enhanced autonomous knowledge collection
+    this.enhancedKnowledgeCollector.startEnhancedCollection();
 
     this.logger.info('Cognitive processes started successfully');
   }

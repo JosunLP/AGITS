@@ -35,6 +35,16 @@ AGITS ist darauf ausgelegt, eine hochflexible und leistungsstarke AGI-Architektu
 - **Learning Metrics**: Detaillierte Metriken zu Lernfortschritt und -effizienz
 - **Performance Monitoring**: Kontinuierliche Überwachung und Optimierung der Systemleistung
 
+### Erweiterte Wissenssammlung
+
+- **Web Scraping Integration**: Automatische Sammlung von Wissen aus vertrauenswürdigen Webquellen
+- **External API Integration**: Verbindung zu externen APIs für strukturierte Datensammlung
+- **Trusted Sources Management**: Konfigurierbare vertrauenswürdige Quellen mit Glaubwürdigkeitsbewertung
+- **Quality Assessment**: Automatische Bewertung der Qualität und Relevanz gesammelter Informationen
+- **Enhanced Collection Strategies**: Multiple Sammlungsstrategien (kontinuierlich, geplant, ereignisgesteuert, schwellenwertbasiert)
+- **Rate Limiting & Caching**: Intelligente Ratenbegrenzung und Zwischenspeicherung für optimale Performance
+- **Collection Statistics**: Detaillierte Statistiken und Monitoring der Wissenssammlung
+
 ## 🏗️ Systemarchitektur
 
 ### Core-Systeme

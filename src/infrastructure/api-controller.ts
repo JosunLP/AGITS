@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { AutonomousKnowledgeCollector } from '../core/autonomous-knowledge-collector.js';
 import { AutonomousProcessScheduler } from '../core/autonomous-scheduler.js';
 import { ChemicalSignalingSystem } from '../core/chemical-signaling.js';
+import { EnhancedAutonomousKnowledgeCollector } from '../core/enhanced-autonomous-knowledge-collector.js';
 import { KnowledgeManagementSystem } from '../core/knowledge-management.js';
 import { MemoryManagementSystem } from '../core/memory-management.js';
 import { AttentionManager } from '../services/cognitive/attention-manager.js';
@@ -29,6 +30,7 @@ export class APIController {
   private scheduler: AutonomousProcessScheduler;
   private memorySystem: MemoryManagementSystem;
   private knowledgeCollector?: AutonomousKnowledgeCollector;
+  private enhancedKnowledgeCollector?: EnhancedAutonomousKnowledgeCollector;
   private chemicalSignaling?: ChemicalSignalingSystem;
   private learningOrchestrator?: LearningOrchestrator;
   private reasoningEngine?: ReasoningEngineService;
@@ -43,6 +45,7 @@ export class APIController {
     memorySystem: MemoryManagementSystem,
     options?: {
       knowledgeCollector?: AutonomousKnowledgeCollector;
+      enhancedKnowledgeCollector?: EnhancedAutonomousKnowledgeCollector;
       chemicalSignaling?: ChemicalSignalingSystem;
       learningOrchestrator?: LearningOrchestrator;
       reasoningEngine?: ReasoningEngineService;
@@ -61,6 +64,8 @@ export class APIController {
     if (options) {
       if (options.knowledgeCollector)
         this.knowledgeCollector = options.knowledgeCollector;
+      if (options.enhancedKnowledgeCollector)
+        this.enhancedKnowledgeCollector = options.enhancedKnowledgeCollector;
       if (options.chemicalSignaling)
         this.chemicalSignaling = options.chemicalSignaling;
       if (options.learningOrchestrator)
@@ -91,6 +96,37 @@ export class APIController {
     server.get('/api/knowledge/stats', this.getKnowledgeStats.bind(this));
     server.get('/api/knowledge/:id', this.getKnowledge.bind(this));
     server.delete('/api/knowledge/:id', this.deleteKnowledge.bind(this));
+
+    // Enhanced knowledge acquisition endpoints
+    server.post(
+      '/api/knowledge/collect/web',
+      this.collectWebKnowledge.bind(this)
+    );
+    server.post(
+      '/api/knowledge/collect/api',
+      this.collectApiKnowledge.bind(this)
+    );
+    server.post(
+      '/api/knowledge/collect/enhanced',
+      this.triggerEnhancedCollection.bind(this)
+    );
+    server.get('/api/knowledge/sources', this.getKnowledgeSources.bind(this));
+    server.get(
+      '/api/knowledge/sources/trusted',
+      this.getTrustedSources.bind(this)
+    );
+    server.get(
+      '/api/knowledge/web-scraping/stats',
+      this.getWebScrapingStats.bind(this)
+    );
+    server.get(
+      '/api/knowledge/external-api/stats',
+      this.getExternalApiStats.bind(this)
+    );
+    server.get(
+      '/api/knowledge/enhanced/stats',
+      this.getEnhancedCollectionStats.bind(this)
+    );
 
     // Memory management endpoints
     server.get('/api/memory/stats', this.getMemoryStats.bind(this));
@@ -180,8 +216,7 @@ export class APIController {
       '/api/autonomous/deactivate',
       this.deactivateAutonomous.bind(this)
     );
-    server.get('/api/autonomous/status', this.getAutonomousStatus.bind(this));
-
+    server.get('/api/autonomous/services', this.getAutonomousStatus.bind(this));
     // Advanced memory management endpoints
     server.post(
       '/api/memory/trigger-consolidation',
@@ -2771,6 +2806,247 @@ export class APIController {
     } catch (error) {
       this.logger.error('Failed to get autonomous system status:', error);
       reply.code(500).send({ error: 'Failed to get autonomous system status' });
+    }
+  }
+
+  // Enhanced Knowledge Collection Endpoints
+
+  /**
+   * Trigger web-based knowledge collection
+   */
+  async collectWebKnowledge(request: any, reply: any) {
+    try {
+      if (!this.enhancedKnowledgeCollector) {
+        reply
+          .code(503)
+          .send({ error: 'Enhanced knowledge collector not available' });
+        return;
+      }
+
+      const { urls, topics, strategy } = request.body;
+      const result = await this.enhancedKnowledgeCollector.collectWebKnowledge({
+        urls: urls || [],
+        topics: topics || [],
+        strategy: strategy || 'balanced',
+      });
+
+      reply.code(200).send({
+        success: true,
+        data: result,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      this.logger.error('Failed to collect web knowledge:', error);
+      reply.code(500).send({ error: 'Failed to collect web knowledge' });
+    }
+  }
+
+  /**
+   * Trigger API-based knowledge collection
+   */
+  async collectApiKnowledge(request: any, reply: any) {
+    try {
+      if (!this.enhancedKnowledgeCollector) {
+        reply
+          .code(503)
+          .send({ error: 'Enhanced knowledge collector not available' });
+        return;
+      }
+
+      const { apis, topics, strategy } = request.body;
+      const result = await this.enhancedKnowledgeCollector.collectApiKnowledge({
+        apis: apis || [],
+        topics: topics || [],
+        strategy: strategy || 'balanced',
+      });
+
+      reply.code(200).send({
+        success: true,
+        data: result,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      this.logger.error('Failed to collect API knowledge:', error);
+      reply.code(500).send({ error: 'Failed to collect API knowledge' });
+    }
+  }
+
+  /**
+   * Trigger enhanced knowledge collection with multiple strategies
+   */
+  async triggerEnhancedCollection(request: any, reply: any) {
+    try {
+      if (!this.enhancedKnowledgeCollector) {
+        reply
+          .code(503)
+          .send({ error: 'Enhanced knowledge collector not available' });
+        return;
+      }
+
+      const {
+        enableWebScraping = true,
+        enableApiCollection = true,
+        enableMemoryDiscovery = true,
+        enablePatternDiscovery = true,
+        strategy = 'comprehensive',
+        qualityThreshold = 0.7,
+        credibilityThreshold = 0.6,
+      } = request.body;
+
+      const result =
+        await this.enhancedKnowledgeCollector.triggerEnhancedCollection({
+          enableWebScraping,
+          enableApiCollection,
+          enableMemoryDiscovery,
+          enablePatternDiscovery,
+          strategy,
+          qualityThreshold,
+          credibilityThreshold,
+        });
+
+      reply.code(200).send({
+        success: true,
+        data: result,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      this.logger.error('Failed to trigger enhanced collection:', error);
+      reply.code(500).send({ error: 'Failed to trigger enhanced collection' });
+    }
+  }
+
+  /**
+   * Get available knowledge sources
+   */
+  async getKnowledgeSources(request: any, reply: any) {
+    try {
+      if (!this.enhancedKnowledgeCollector) {
+        reply
+          .code(503)
+          .send({ error: 'Enhanced knowledge collector not available' });
+        return;
+      }
+
+      const sources =
+        await this.enhancedKnowledgeCollector.getKnowledgeSources();
+
+      reply.code(200).send({
+        success: true,
+        data: {
+          sources,
+          totalCount: sources.length,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      this.logger.error('Failed to get knowledge sources:', error);
+      reply.code(500).send({ error: 'Failed to get knowledge sources' });
+    }
+  }
+
+  /**
+   * Get trusted sources configuration
+   */
+  async getTrustedSources(request: any, reply: any) {
+    try {
+      if (!this.enhancedKnowledgeCollector) {
+        reply
+          .code(503)
+          .send({ error: 'Enhanced knowledge collector not available' });
+        return;
+      }
+
+      const trustedSources =
+        await this.enhancedKnowledgeCollector.getTrustedSources();
+
+      reply.code(200).send({
+        success: true,
+        data: {
+          trustedSources,
+          totalCount: trustedSources.length,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      this.logger.error('Failed to get trusted sources:', error);
+      reply.code(500).send({ error: 'Failed to get trusted sources' });
+    }
+  }
+
+  /**
+   * Get web scraping statistics
+   */
+  async getWebScrapingStats(request: any, reply: any) {
+    try {
+      if (!this.enhancedKnowledgeCollector) {
+        reply
+          .code(503)
+          .send({ error: 'Enhanced knowledge collector not available' });
+        return;
+      }
+
+      const stats = await this.enhancedKnowledgeCollector.getWebScrapingStats();
+
+      reply.code(200).send({
+        success: true,
+        data: stats,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      this.logger.error('Failed to get web scraping stats:', error);
+      reply.code(500).send({ error: 'Failed to get web scraping stats' });
+    }
+  }
+
+  /**
+   * Get external API statistics
+   */
+  async getExternalApiStats(request: any, reply: any) {
+    try {
+      if (!this.enhancedKnowledgeCollector) {
+        reply
+          .code(503)
+          .send({ error: 'Enhanced knowledge collector not available' });
+        return;
+      }
+
+      const stats = await this.enhancedKnowledgeCollector.getExternalApiStats();
+
+      reply.code(200).send({
+        success: true,
+        data: stats,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      this.logger.error('Failed to get external API stats:', error);
+      reply.code(500).send({ error: 'Failed to get external API stats' });
+    }
+  }
+
+  /**
+   * Get enhanced collection statistics
+   */
+  async getEnhancedCollectionStats(request: any, reply: any) {
+    try {
+      if (!this.enhancedKnowledgeCollector) {
+        reply
+          .code(503)
+          .send({ error: 'Enhanced knowledge collector not available' });
+        return;
+      }
+
+      const stats = await this.enhancedKnowledgeCollector.getCollectionStats();
+
+      reply.code(200).send({
+        success: true,
+        data: stats,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      this.logger.error('Failed to get enhanced collection stats:', error);
+      reply
+        .code(500)
+        .send({ error: 'Failed to get enhanced collection stats' });
     }
   }
 }

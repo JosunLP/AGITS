@@ -24,3 +24,7 @@ export * from './learning.type.js';
 // System types and interfaces
 export * from './system.interface.js';
 export * from './system.type.js';
+
+// Data Acquisition types and interfaces
+export * from './data-acquisition.interface.js';
+export * from './data-acquisition.type.js';
