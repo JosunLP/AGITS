@@ -623,6 +623,22 @@ export class DecisionEngine extends TypedEventEmitter<DecisionEngineEvents> {
       activeConstraints: this.activeConstraints.size,
     };
   }
+
+  /**
+   * Get recent decisions
+   */
+  public getRecentDecisions(limit = 10): DecisionResult[] {
+    return this.decisionHistory
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .slice(0, limit);
+  }
+
+  /**
+   * Check if decision engine is running
+   */
+  public getIsRunning(): boolean {
+    return this.isRunning;
+  }
 }
 
 interface DecisionRequest {

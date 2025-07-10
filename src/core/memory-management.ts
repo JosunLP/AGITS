@@ -1,3 +1,5 @@
+import { LearningConfig } from '../config/app.js';
+import { DataPersistenceLayer } from '../infrastructure/data-persistence-layer.js';
 import {
   ConnectionType,
   LearningExperience,
@@ -6,6 +8,7 @@ import {
   MemoryType,
 } from '../types/index.js';
 import { EventMap, TypedEventEmitter } from '../utils/event-emitter.js';
+import { Logger } from '../utils/logger.js';
 
 /**
  * Event map for MemoryManagementSystem
@@ -15,6 +18,8 @@ interface MemoryEvents extends EventMap {
   memoryConsolidated: (memory: MemoryNode) => void;
   memoryDecayed: (memoryId: string) => void;
   connectionStrengthened: (connection: MemoryConnection) => void;
+  memoryPruned: (memoryId: string) => void;
+  memoryUpdated: (memory: MemoryNode) => void;
 }
 
 /**
@@ -22,6 +27,7 @@ interface MemoryEvents extends EventMap {
  * with episodic and semantic memory, synaptic plasticity, and memory consolidation
  */
 export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
+  private logger = new Logger('MemoryManagementSystem');
   private memoryNodes: Map<string, MemoryNode> = new Map();
   private episodicMemory: Map<string, MemoryNode> = new Map();
   private semanticMemory: Map<string, MemoryNode> = new Map();
@@ -32,23 +38,78 @@ export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
   private accessPatterns: Map<string, AccessPattern> = new Map();
   private consolidationQueue: MemoryNode[] = [];
 
-  // Hebbian learning parameters
-  private readonly HEBBIAN_LEARNING_RATE = 0.01;
-  private readonly DECAY_RATE = 0.001;
-  private readonly PRUNING_THRESHOLD = 0.1;
-  private readonly CONSOLIDATION_THRESHOLD = 5; // Access count threshold
+  // Configuration
+  private config: LearningConfig;
+  private persistenceLayer: DataPersistenceLayer | null;
 
-  constructor() {
+  // Maintenance intervals
+  private consolidationInterval: NodeJS.Timeout | null = null;
+  private decayInterval: NodeJS.Timeout | null = null;
+  private pruningInterval: NodeJS.Timeout | null = null;
+
+  constructor(config: LearningConfig, persistenceLayer?: DataPersistenceLayer) {
     super();
+    this.config = config;
+    this.persistenceLayer = persistenceLayer || null;
     this.startMemoryMaintenance();
+
+    if (persistenceLayer) {
+      this.loadMemoriesFromPersistence();
+    }
   }
 
   /**
-   * Store a new memory
+   * Load memories from persistence layer
    */
-  public storeMemory(
+  private async loadMemoriesFromPersistence(): Promise<void> {
+    if (!this.persistenceLayer) return;
+
+    try {
+      this.logger.info('Loading memories from persistence...');
+
+      // Load all memories
+      const memories = await this.persistenceLayer.searchMemories({}, 10000);
+
+      for (const memory of memories) {
+        this.memoryNodes.set(memory.id, memory);
+
+        // Route to appropriate memory store
+        switch (memory.type) {
+          case MemoryType.EPISODIC:
+            this.episodicMemory.set(memory.id, memory);
+            break;
+          case MemoryType.SEMANTIC:
+            this.semanticMemory.set(memory.id, memory);
+            break;
+          case MemoryType.WORKING:
+            this.workingMemory.set(memory.id, memory);
+            break;
+          case MemoryType.PROCEDURAL:
+            this.proceduralMemory.set(memory.id, memory);
+            break;
+        }
+
+        // Initialize access pattern
+        this.accessPatterns.set(memory.id, {
+          nodeId: memory.id,
+          accessTimes: [memory.lastAccessed],
+          strengthHistory: [memory.strength],
+          associatedNodes: [],
+        });
+      }
+
+      this.logger.info(`Loaded ${memories.length} memories from persistence`);
+    } catch (error) {
+      this.logger.error('Failed to load memories from persistence:', error);
+    }
+  }
+
+  /**
+   * Store a new memory with persistence
+   */
+  public async storeMemory(
     memory: Omit<MemoryNode, 'id' | 'lastAccessed' | 'accessCount'>
-  ): string {
+  ): Promise<string> {
     const memoryNode: MemoryNode = {
       ...memory,
       id: this.generateMemoryId(),
@@ -82,6 +143,15 @@ export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
       associatedNodes: [],
     });
 
+    // Persist to database
+    if (this.persistenceLayer) {
+      try {
+        await this.persistenceLayer.storeMemory(memoryNode);
+      } catch (error) {
+        this.logger.error(`Failed to persist memory ${memoryNode.id}:`, error);
+      }
+    }
+
     this.emit('memoryStored', memoryNode);
     return memoryNode.id;
   }
@@ -109,7 +179,7 @@ export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
 
     // Check for consolidation eligibility
     if (
-      memory.accessCount >= this.CONSOLIDATION_THRESHOLD &&
+      memory.accessCount >= this.config.consolidationThreshold &&
       memory.type === MemoryType.EPISODIC
     ) {
       this.addToConsolidationQueue(memory);
@@ -218,9 +288,11 @@ export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
   /**
    * Implement learning from experience
    */
-  public learnFromExperience(experience: LearningExperience): void {
+  public async learnFromExperience(
+    experience: LearningExperience
+  ): Promise<void> {
     // Create memory for the experience
-    const memoryId = this.storeMemory({
+    const memoryId = await this.storeMemory({
       type: MemoryType.EPISODIC,
       content: {
         experience: experience.input,
@@ -270,7 +342,7 @@ export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
   /**
    * Consolidate memories (episodic to semantic transfer)
    */
-  private performMemoryConsolidation(): void {
+  private async performMemoryConsolidation(): Promise<void> {
     if (this.consolidationQueue.length === 0) return;
 
     const memory = this.consolidationQueue.shift()!;
@@ -289,9 +361,21 @@ export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
           1.0
         );
         existingSemantic.accessCount++;
+
+        // Update in persistence
+        if (this.persistenceLayer) {
+          try {
+            await this.persistenceLayer.storeMemory(existingSemantic);
+          } catch (error) {
+            this.logger.error(
+              `Failed to persist updated memory ${existingSemantic.id}:`,
+              error
+            );
+          }
+        }
       } else {
         // Create new semantic memory
-        this.storeMemory({
+        await this.storeMemory({
           type: MemoryType.SEMANTIC,
           content: semanticContent,
           connections: [],
@@ -315,7 +399,7 @@ export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
     // Prune weak connections
     for (const memory of this.memoryNodes.values()) {
       memory.connections = memory.connections.filter(
-        (conn) => conn.weight > this.PRUNING_THRESHOLD
+        (conn) => conn.weight > this.config.pruningThreshold
       );
     }
 
@@ -351,7 +435,9 @@ export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
     for (const memory of this.memoryNodes.values()) {
       // Decay strength if not recently accessed
       const timeSinceAccess = Date.now() - memory.lastAccessed.getTime();
-      const decayFactor = Math.exp((-this.DECAY_RATE * timeSinceAccess) / 1000);
+      const decayFactor = Math.exp(
+        (-this.config.decayRate * timeSinceAccess) / 1000
+      );
 
       memory.strength *= decayFactor;
 
@@ -368,20 +454,38 @@ export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
    * Start background memory maintenance
    */
   private startMemoryMaintenance(): void {
-    // Memory consolidation every 10 seconds
-    setInterval(() => {
-      this.performMemoryConsolidation();
-    }, 10000);
+    // Memory consolidation
+    this.consolidationInterval = setInterval(async () => {
+      await this.performMemoryConsolidation();
+    }, this.config.memoryConsolidationInterval);
 
-    // Synaptic pruning every 30 seconds
-    setInterval(() => {
+    // Synaptic pruning
+    this.pruningInterval = setInterval(() => {
       this.performSynapticPruning();
-    }, 30000);
+    }, this.config.synapticPruningInterval);
 
-    // Synaptic decay every 5 seconds
-    setInterval(() => {
+    // Synaptic decay
+    this.decayInterval = setInterval(() => {
       this.applySynapticDecay();
-    }, 5000);
+    }, this.config.synapticDecayInterval);
+  }
+
+  /**
+   * Stop memory maintenance processes
+   */
+  public stopMemoryMaintenance(): void {
+    if (this.consolidationInterval) {
+      clearInterval(this.consolidationInterval);
+      this.consolidationInterval = null;
+    }
+    if (this.pruningInterval) {
+      clearInterval(this.pruningInterval);
+      this.pruningInterval = null;
+    }
+    if (this.decayInterval) {
+      clearInterval(this.decayInterval);
+      this.decayInterval = null;
+    }
   }
 
   /**
@@ -392,7 +496,7 @@ export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
     if (!memory) return;
 
     memory.strength = Math.min(
-      memory.strength + this.HEBBIAN_LEARNING_RATE,
+      memory.strength + this.config.hebbianLearningRate,
       1.0
     );
 
@@ -402,7 +506,7 @@ export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
       if (targetMemory) {
         targetMemory.strength = Math.min(
           targetMemory.strength +
-            this.HEBBIAN_LEARNING_RATE * connection.weight,
+            this.config.hebbianLearningRate * connection.weight,
           1.0
         );
       }

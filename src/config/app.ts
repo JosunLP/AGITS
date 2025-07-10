@@ -1,8 +1,119 @@
 import { config } from 'dotenv';
 import { Environment, LogLevel, ServiceConfig } from '../types/index.js';
+import { DatabaseConfig, defaultDatabaseConfig } from './database.js';
 
 // Load environment variables
 config();
+
+/**
+ * Learning Configuration - Controls autonomous learning behavior
+ */
+export interface LearningConfig {
+  // Autonomous process intervals (milliseconds)
+  memoryConsolidationInterval: number;
+  synapticPruningInterval: number;
+  synapticDecayInterval: number;
+  learningCycleInterval: number;
+  knowledgeExtractionInterval: number;
+  patternDiscoveryInterval: number;
+  goalEvaluationInterval: number;
+  performanceAnalysisInterval: number;
+
+  // Learning parameters
+  learningRate: number;
+  explorationRate: number;
+  batchSize: number;
+  maxQueueSize: number;
+
+  // Memory thresholds
+  hebbianLearningRate: number;
+  decayRate: number;
+  pruningThreshold: number;
+  consolidationThreshold: number;
+
+  // Knowledge collection
+  maxConcurrentCollectionTasks: number;
+  collectionHistoryLimit: number;
+  errorThreshold: number;
+  confidenceThreshold: number;
+}
+
+/**
+ * Cognitive Configuration - Controls cognitive processing
+ */
+export interface CognitiveConfig {
+  // Attention management
+  attentionUpdateInterval: number;
+  maxAttentionTargets: number;
+  attentionDecayRate: number;
+
+  // Decision making
+  decisionLoopInterval: number;
+  maxDecisionTimeMs: number;
+  confidenceThreshold: number;
+
+  // Reasoning
+  maxReasoningDepth: number;
+  chainOfThoughtEnabled: boolean;
+  analogicalReasoningEnabled: boolean;
+
+  // Language processing
+  maxResponseLength: number;
+  contextWindowSize: number;
+  sentimentAnalysisEnabled: boolean;
+}
+
+export const defaultLearningConfig: LearningConfig = {
+  // Autonomous process intervals (milliseconds)
+  memoryConsolidationInterval: 10000, // 10 seconds
+  synapticPruningInterval: 30000, // 30 seconds
+  synapticDecayInterval: 5000, // 5 seconds
+  learningCycleInterval: 15000, // 15 seconds
+  knowledgeExtractionInterval: 60000, // 60 seconds
+  patternDiscoveryInterval: 45000, // 45 seconds
+  goalEvaluationInterval: 20000, // 20 seconds
+  performanceAnalysisInterval: 300000, // 5 minutes
+
+  // Learning parameters
+  learningRate: 0.01,
+  explorationRate: 0.1,
+  batchSize: 10,
+  maxQueueSize: 1000,
+
+  // Memory thresholds
+  hebbianLearningRate: 0.01,
+  decayRate: 0.001,
+  pruningThreshold: 0.1,
+  consolidationThreshold: 5,
+
+  // Knowledge collection
+  maxConcurrentCollectionTasks: 3,
+  collectionHistoryLimit: 1000,
+  errorThreshold: 0.2,
+  confidenceThreshold: 0.5,
+};
+
+export const defaultCognitiveConfig: CognitiveConfig = {
+  // Attention management
+  attentionUpdateInterval: 100, // 100ms
+  maxAttentionTargets: 5,
+  attentionDecayRate: 0.01,
+
+  // Decision making
+  decisionLoopInterval: 1000, // 1 second
+  maxDecisionTimeMs: 5000, // 5 seconds
+  confidenceThreshold: 0.7,
+
+  // Reasoning
+  maxReasoningDepth: 10,
+  chainOfThoughtEnabled: true,
+  analogicalReasoningEnabled: true,
+
+  // Language processing
+  maxResponseLength: 4000,
+  contextWindowSize: 8000,
+  sentimentAnalysisEnabled: true,
+};
 
 /**
  * Application configuration with environment-specific settings
@@ -12,6 +123,9 @@ export class AppConfig {
   public readonly port: number;
   public readonly host: string;
   public readonly logLevel: LogLevel;
+  public readonly learning: LearningConfig;
+  public readonly cognitive: CognitiveConfig;
+  public readonly database: DatabaseConfig;
 
   // Database configurations
   public readonly mongodb: {
@@ -78,6 +192,9 @@ export class AppConfig {
     this.port = parseInt(process.env.PORT || '3000', 10);
     this.host = process.env.HOST || '0.0.0.0';
     this.logLevel = (process.env.LOG_LEVEL as LogLevel) || LogLevel.INFO;
+    this.learning = defaultLearningConfig;
+    this.cognitive = defaultCognitiveConfig;
+    this.database = defaultDatabaseConfig as DatabaseConfig;
 
     // Database configurations
     this.mongodb = {
@@ -156,6 +273,60 @@ export class AppConfig {
       inferenceTimeout: parseInt(process.env.INFERENCE_TIMEOUT || '30000', 10),
       batchSize: parseInt(process.env.BATCH_SIZE || '32', 10),
       learningRate: parseFloat(process.env.LEARNING_RATE || '0.001'),
+    };
+
+    // Learning Configuration - Controls autonomous learning behavior
+    this.learning = {
+      // Autonomous process intervals (milliseconds)
+      memoryConsolidationInterval: 10000, // 10 seconds
+      synapticPruningInterval: 30000, // 30 seconds
+      synapticDecayInterval: 5000, // 5 seconds
+      learningCycleInterval: 15000, // 15 seconds
+      knowledgeExtractionInterval: 60000, // 60 seconds
+      patternDiscoveryInterval: 45000, // 45 seconds
+      goalEvaluationInterval: 20000, // 20 seconds
+      performanceAnalysisInterval: 300000, // 5 minutes
+
+      // Learning parameters
+      learningRate: 0.01,
+      explorationRate: 0.1,
+      batchSize: 10,
+      maxQueueSize: 1000,
+
+      // Memory thresholds
+      hebbianLearningRate: 0.01,
+      decayRate: 0.001,
+      pruningThreshold: 0.1,
+      consolidationThreshold: 5,
+
+      // Knowledge collection
+      maxConcurrentCollectionTasks: 3,
+      collectionHistoryLimit: 1000,
+      errorThreshold: 0.2,
+      confidenceThreshold: 0.5,
+    };
+
+    // Cognitive Configuration - Controls cognitive processing
+    this.cognitive = {
+      // Attention management
+      attentionUpdateInterval: 100, // 100ms
+      maxAttentionTargets: 5,
+      attentionDecayRate: 0.01,
+
+      // Decision making
+      decisionLoopInterval: 1000, // 1 second
+      maxDecisionTimeMs: 5000, // 5 seconds
+      confidenceThreshold: 0.7,
+
+      // Reasoning
+      maxReasoningDepth: 10,
+      chainOfThoughtEnabled: true,
+      analogicalReasoningEnabled: true,
+
+      // Language processing
+      maxResponseLength: 4000,
+      contextWindowSize: 8000,
+      sentimentAnalysisEnabled: true,
     };
   }
 

@@ -1,8 +1,16 @@
-# Architekturkonzept für eine AGI-Plattform
+# Architekturkonzept für eine AGI-Plattform (Erweitert 2025)
 
 ## 1. Systemüberblick
 
-Die Architektur folgt einer modularen Microservices-Struktur, die biologische Prinzipien der Hirnfunktion mit modernen Cloud-Native-Technologien kombiniert. Das System ist darauf ausgelegt, kontinuierliches Lernen, autonome Datensammlung und komplexe Reasoning-Fähigkeiten zu unterstützen.
+Die Architektur folgt einer modularen Microservices-Struktur, die biologische Prinzipien der Hirnfunktion mit modernen Cloud-Native-Technologien kombiniert. Das System ist darauf ausgelegt, kontinuierliches Lernen, autonome Datensammlung und komplexe Reasoning-Fähigkeiten mit persistenter Speicherung zu unterstützen.
+
+### Neue Architektur-Features 2025
+
+- **Persistente Speicherung**: Vollständig integrierte MongoDB, Neo4j und Redis-Unterstützung
+- **Erweiterte Memory Hierarchie**: Kurz-, Mittel- und Langzeitgedächtnis mit automatischer Konsolidierung
+- **Enhanced Reasoning Engine**: Multi-Type Reasoning mit Konfidenz-Tracking und Chain-of-Thought
+- **Autonomous System Management**: Vollständige Steuerung aller autonomen Prozesse über API
+- **Performance Monitoring**: Kontinuierliche Überwachung und Optimierung aller Systemkomponenten
 
 ## 2. Technologie-Stack
 
@@ -10,9 +18,17 @@ Die Architektur folgt einer modularen Microservices-Struktur, die biologische Pr
 
 - **Runtime**: Node.js 20+ mit TypeScript 5.x
 - **Build System**: Vite mit ESM-Module-Unterstützung
+- **Datenbanken**: MongoDB (Dokumente), Neo4j (Graphen), Redis (Cache/Sessions)
 - **Containerisierung**: Docker mit Multi-Stage-Builds
 - **Orchestrierung**: Kubernetes mit Helm Charts
 - **Service Mesh**: Istio für Inter-Service-Kommunikation
+
+### Persistierung & Caching
+
+- **MongoDB**: Primäre Datenspeicherung für Gedächtnisinhalte und Wissen
+- **Neo4j**: Semantische Graphen für Wissensbeziehungen und Reasoning-Ketten
+- **Redis**: High-Performance-Cache für Session-Management und temporäre Daten
+- **Data Persistence Layer**: Einheitliche Abstraktionsschicht für alle Datenbanken
 
 ### Entwicklungsumgebung
 
@@ -23,28 +39,69 @@ Die Architektur folgt einer modularen Microservices-Struktur, die biologische Pr
 
 ## 3. Modulare Architektur
 
-### 3.1 Core-Module
+### 3.1 Core-Module (Erweitert)
 
-#### Cognitive Services Layer
+#### Enhanced Cognitive Services Layer
 
-- **Reasoning Engine Service**: Implementiert Chain-of-Thought-Reasoning und logische Inferenz
-- **Memory Management Service**: Episodisches und semantisches Gedächtnis mit Hierarchical Temporal Memory
-- **Learning Orchestrator**: Kontinuierliches Lernen mit Catastrophic Forgetting Prevention
-- **Attention Manager**: Dynamische Aufmerksamkeitssteuerung für Multi-Task-Verarbeitung
+- **Advanced Reasoning Engine Service**:
+  - Chain-of-Thought-Reasoning mit schrittweiser Dokumentation
+  - Multi-Type Reasoning (deduktiv, induktiv, abduktiv, analogisch, kausal)
+  - Konfidenz-Tracking und Gewissheitslevel für alle Schlussfolgerungen
+  - Persistent gespeicherte Reasoning-Historie mit Performance-Analyse
 
-#### Sensory Processing Layer
+- **Enhanced Memory Management Service**:
+  - Hierarchisches Gedächtnissystem (Arbeits-, Kurz-, Mittel-, Langzeitgedächtnis)
+  - Automatische Memory Consolidation mit konfigurierbaren Intervallen
+  - Synaptic Pruning zur intelligenten Entfernung veralteter Informationen
+  - Memory Maintenance mit kontinuierlicher Optimierung
+  - Vollständige Persistierung aller Gedächtnisinhalte
 
-- **Data Ingestion Service**: Multi-Modal-Datenerfassung (Text, Bild, Audio, Video)
-- **Preprocessing Pipeline**: Normalisierung und Feature-Extraktion
-- **Pattern Recognition Service**: Objekt-, Sprach- und Verhaltensmarkenerkennung
-- **Contextual Analysis Service**: Situative Bewertung eingehender Daten
+- **Adaptive Learning Orchestrator**:
+  - Kontinuierliches Lernen mit adaptiven Zyklen
+  - Performance-basierte Anpassung der Lernparameter
+  - Catastrophic Forgetting Prevention mit verbesserter Algorithmus
+  - Detaillierte Lernmetriken und -analyse
 
-#### Executive Function Layer
+- **Attention Manager**: Dynamische Aufmerksamkeitssteuerung für Multi-Task-Verarbeitung mit erweiterten Priorisierungsalgorithmen
 
-- **Decision Engine**: Autonome Entscheidungsfindung basierend auf Zielen und Constraints
-- **Planning Service**: Hierarchische Aufgabenplanung mit Backtracking
-- **Execution Coordinator**: Orchestrierung von Aktionen und Workflows
-- **Goal Management**: Dynamische Zielanpassung und Priorisierung
+#### Enhanced Sensory Processing Layer
+
+- **Data Ingestion Service**: Multi-Modal-Datenerfassung (Text, Bild, Audio, Video) mit erweiterten Preprocessing-Capabilities
+- **Preprocessing Pipeline**: Normalisierung und Feature-Extraktion mit ML-basierten Verbesserungen
+- **Pattern Recognition Service**: Objekt-, Sprach- und Verhaltensmarkenerkennung mit erhöhter Genauigkeit
+- **Contextual Analysis Service**: Situative Bewertung eingehender Daten mit semantischer Analyse
+
+#### Enhanced Executive Function Layer
+
+- **Enhanced Decision Engine**:
+  - Autonome Entscheidungsfindung mit Multi-Kriterien-Bewertung
+  - Konfidenz-basierte Entscheidungsqualität
+  - Vollständige Entscheidungshistorie mit Analyse
+  - Integration mit Enhanced Reasoning Engine
+
+- **Planning Service**: Hierarchische Aufgabenplanung mit Backtracking und verbesserter Strategieentwicklung
+- **Execution Coordinator**: Orchestrierung von Aktionen und Workflows mit erweiterten Monitoring-Capabilities
+- **Goal Management**: Dynamische Zielanpassung und Priorisierung mit KI-gestützter Optimierung
+
+#### Infrastructure & Persistence Layer (Neu)
+
+- **Data Persistence Layer**:
+  - Einheitliche Schnittstelle für MongoDB, Neo4j und Redis
+  - Automatische Failover und Load Balancing
+  - Transaktionale Konsistenz zwischen verschiedenen Datenquellen
+  - Performance-optimierte Queries und Caching
+
+- **Enhanced API Controller**:
+  - Über 50 REST-Endpunkte für alle Systemfunktionen
+  - Comprehensive Error Handling und Logging
+  - Rate Limiting und Security Features
+  - Real-time System Monitoring Endpoints
+
+- **Health Monitoring System**:
+  - Kontinuierliche Überwachung aller Services
+  - Performance-Metriken und Alerts
+  - Automatische Service Recovery
+  - Detailed System Diagnostics
 
 #### Communication Layer
 

@@ -1,4 +1,7 @@
 import { EventEmitter } from 'events';
+import { LearningConfig } from '../config/app.js';
+import { DataPersistenceLayer } from '../infrastructure/data-persistence-layer.js';
+import { KnowledgeItem, KnowledgeRelationship } from '../types/index.js';
 import { Logger } from '../utils/logger.js';
 import { MemoryManagementSystem } from './memory-management.js';
 
@@ -26,28 +29,6 @@ export enum ConfidenceLevel {
 }
 
 /**
- * Knowledge item interface
- */
-interface KnowledgeItem {
-  id: string;
-  type: KnowledgeType;
-  content: any;
-  subject: string;
-  description?: string;
-  confidence: number;
-  confidenceLevel: ConfidenceLevel;
-  sources: string[];
-  tags: string[];
-  relationships: KnowledgeRelationship[];
-  createdAt: Date;
-  updatedAt: Date;
-  accessCount: number;
-  lastAccessed: Date;
-  verification: VerificationInfo;
-  metadata: Record<string, any>;
-}
-
-/**
  * Knowledge relationship types
  */
 export enum RelationshipType {
@@ -60,19 +41,6 @@ export enum RelationshipType {
   SUPPORTS = 'supports',
   SIMILAR_TO = 'similar_to',
   DERIVED_FROM = 'derived_from',
-}
-
-/**
- * Knowledge relationship interface
- */
-interface KnowledgeRelationship {
-  targetId: string;
-  type: RelationshipType;
-  strength: number;
-  confidence: number;
-  context?: string;
-  evidence?: string[];
-  createdAt: Date;
 }
 
 /**
@@ -163,34 +131,97 @@ interface KnowledgeStats {
 export class KnowledgeManagementSystem extends EventEmitter {
   private logger: Logger;
   private memorySystem: MemoryManagementSystem;
+  private persistenceLayer: DataPersistenceLayer | null;
+  private config: LearningConfig;
   private knowledgeBase: Map<string, KnowledgeItem> = new Map();
   private subjectIndex: Map<string, Set<string>> = new Map();
   private tagIndex: Map<string, Set<string>> = new Map();
   private relationshipGraph: Map<string, Set<KnowledgeRelationship>> =
     new Map();
+  private verificationQueue: KnowledgeItem[] = [];
 
-  // Knowledge processing parameters
-  private readonly CONFIDENCE_THRESHOLD = 0.3;
-  private readonly RELATIONSHIP_STRENGTH_THRESHOLD = 0.5;
-  private readonly VERIFICATION_THRESHOLD = 0.7;
-  private readonly MAX_RELATIONSHIPS_PER_ITEM = 20;
-
-  constructor(memorySystem: MemoryManagementSystem) {
+  constructor(
+    memorySystem: MemoryManagementSystem,
+    config: LearningConfig,
+    persistenceLayer?: DataPersistenceLayer
+  ) {
     super();
     this.logger = new Logger('KnowledgeManagementSystem');
     this.memorySystem = memorySystem;
+    this.config = config;
+    this.persistenceLayer = persistenceLayer || null;
     this.setupMemoryListeners();
+
+    if (persistenceLayer) {
+      this.loadKnowledgeFromPersistence();
+    }
   }
 
   /**
-   * Add knowledge item to the knowledge base
+   * Load knowledge from persistence layer
    */
-  public addKnowledge(
+  private async loadKnowledgeFromPersistence(): Promise<void> {
+    if (!this.persistenceLayer) return;
+
+    try {
+      this.logger.info('Loading knowledge from persistence...');
+
+      // Load all knowledge items
+      const knowledgeItems = await this.persistenceLayer.searchKnowledge(
+        '*',
+        {},
+        10000
+      );
+
+      for (const item of knowledgeItems) {
+        this.knowledgeBase.set(item.id, item);
+        this.updateIndexes(item);
+      }
+
+      this.logger.info(
+        `Loaded ${knowledgeItems.length} knowledge items from persistence`
+      );
+    } catch (error) {
+      this.logger.error('Failed to load knowledge from persistence:', error);
+    }
+  }
+
+  /**
+   * Update all indexes for a knowledge item
+   */
+  private updateIndexes(item: KnowledgeItem): void {
+    // Update subject index (with null check)
+    if (item.subject) {
+      const subjectSet =
+        this.subjectIndex.get(item.subject.toLowerCase()) || new Set();
+      subjectSet.add(item.id);
+      this.subjectIndex.set(item.subject.toLowerCase(), subjectSet);
+    }
+
+    // Update tag index
+    for (const tag of item.tags) {
+      const tagSet = this.tagIndex.get(tag.toLowerCase()) || new Set();
+      tagSet.add(item.id);
+      this.tagIndex.set(tag.toLowerCase(), tagSet);
+    }
+
+    // Update relationship graph
+    const relationshipSet = this.relationshipGraph.get(item.id) || new Set();
+    for (const relationship of item.relationships) {
+      relationshipSet.add(relationship);
+    }
+    this.relationshipGraph.set(item.id, relationshipSet);
+  }
+
+  /**
+   * Add knowledge item to the knowledge base with persistence
+   */
+  public async addKnowledge(
     item: Omit<
       KnowledgeItem,
       'id' | 'createdAt' | 'updatedAt' | 'accessCount' | 'lastAccessed'
     >
-  ): string {
+  ): Promise<string> {
     const knowledgeId = `knowledge_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     const knowledgeItem: KnowledgeItem = {
@@ -206,6 +237,15 @@ export class KnowledgeManagementSystem extends EventEmitter {
     this.knowledgeBase.set(knowledgeId, knowledgeItem);
     this.updateIndices(knowledgeItem);
     this.updateRelationshipGraph(knowledgeItem);
+
+    // Persist to database
+    if (this.persistenceLayer) {
+      try {
+        await this.persistenceLayer.storeKnowledge(knowledgeItem);
+      } catch (error) {
+        this.logger.error(`Failed to persist knowledge ${knowledgeId}:`, error);
+      }
+    }
 
     this.logger.debug(`Knowledge added: ${knowledgeId} (${item.type})`);
     this.emit('knowledgeAdded', knowledgeItem);
@@ -233,7 +273,9 @@ export class KnowledgeManagementSystem extends EventEmitter {
 
     // Filter by types
     if (query.types && query.types.length > 0) {
-      results = results.filter((item) => query.types!.includes(item.type));
+      results = results.filter((item) =>
+        query.types!.includes(item.type as any)
+      );
     }
 
     // Filter by tags
@@ -269,7 +311,7 @@ export class KnowledgeManagementSystem extends EventEmitter {
       const searchTerm = query.textSearch.toLowerCase();
       results = results.filter(
         (item) =>
-          item.subject.toLowerCase().includes(searchTerm) ||
+          (item.subject && item.subject.toLowerCase().includes(searchTerm)) ||
           (item.description &&
             item.description.toLowerCase().includes(searchTerm)) ||
           JSON.stringify(item.content).toLowerCase().includes(searchTerm)
@@ -295,11 +337,11 @@ export class KnowledgeManagementSystem extends EventEmitter {
     results.sort((a, b) => {
       const scoreA =
         a.confidence * 0.5 +
-        (a.accessCount / 100) * 0.3 +
+        ((a.accessCount || 0) / 100) * 0.3 +
         this.getRecencyScore(a) * 0.2;
       const scoreB =
         b.confidence * 0.5 +
-        (b.accessCount / 100) * 0.3 +
+        ((b.accessCount || 0) / 100) * 0.3 +
         this.getRecencyScore(b) * 0.2;
       return scoreB - scoreA;
     });
@@ -311,7 +353,11 @@ export class KnowledgeManagementSystem extends EventEmitter {
 
     // Update access statistics
     results.forEach((item) => {
-      item.accessCount++;
+      if (item.accessCount !== undefined) {
+        item.accessCount++;
+      } else {
+        item.accessCount = 1;
+      }
       item.lastAccessed = new Date();
     });
 
@@ -340,7 +386,7 @@ export class KnowledgeManagementSystem extends EventEmitter {
         if (memory && (memory as any).content) {
           const extracted = this.extractFactualKnowledge(memory);
           if (extracted) {
-            const knowledgeId = this.addKnowledge(extracted);
+            const knowledgeId = await this.addKnowledge(extracted);
             const knowledgeItem = this.knowledgeBase.get(knowledgeId)!;
             extractedItems.push(knowledgeItem);
           }
@@ -399,12 +445,12 @@ export class KnowledgeManagementSystem extends EventEmitter {
       if (relatedItem) {
         if (
           relationship.type === RelationshipType.SUPPORTS &&
-          relationship.confidence > 0.7
+          (relationship.confidence || 0) > 0.7
         ) {
           supportingEvidence.push(relatedItem.id);
         } else if (
           relationship.type === RelationshipType.CONTRADICTS &&
-          relationship.confidence > 0.7
+          (relationship.confidence || 0) > 0.7
         ) {
           contradictions.push(relatedItem.id);
         }
@@ -416,11 +462,11 @@ export class KnowledgeManagementSystem extends EventEmitter {
       supportingEvidence.length,
       contradictions.length,
       item.confidence,
-      item.sources.length
+      (item.sources || []).length
     );
 
     const verification: VerificationInfo = {
-      isVerified: verificationScore >= this.VERIFICATION_THRESHOLD,
+      isVerified: verificationScore >= this.config.confidenceThreshold,
       verificationMethod: 'cross_reference',
       verifiedBy: 'system',
       verificationDate: new Date(),
@@ -482,12 +528,12 @@ export class KnowledgeManagementSystem extends EventEmitter {
   /**
    * Handle new memory storage
    */
-  private onMemoryStored(memory: any): void {
+  private async onMemoryStored(memory: any): Promise<void> {
     // Extract knowledge from newly stored memory
-    if (memory.strength > this.CONFIDENCE_THRESHOLD) {
+    if (memory.strength > this.config.confidenceThreshold) {
       const extracted = this.extractFactualKnowledge(memory);
       if (extracted) {
-        this.addKnowledge(extracted);
+        await this.addKnowledge(extracted);
       }
     }
   }
@@ -522,6 +568,7 @@ export class KnowledgeManagementSystem extends EventEmitter {
       return {
         type,
         content,
+        source: memory.id, // Add required source field
         subject,
         description: this.generateDescription(memory),
         confidence: memory.strength || 0.5,
@@ -771,12 +818,14 @@ export class KnowledgeManagementSystem extends EventEmitter {
    * Update indices for fast searching
    */
   private updateIndices(item: KnowledgeItem): void {
-    // Subject index
-    const subjectKey = item.subject.toLowerCase();
-    if (!this.subjectIndex.has(subjectKey)) {
-      this.subjectIndex.set(subjectKey, new Set());
+    // Subject index (with null check)
+    if (item.subject) {
+      const subjectKey = item.subject.toLowerCase();
+      if (!this.subjectIndex.has(subjectKey)) {
+        this.subjectIndex.set(subjectKey, new Set());
+      }
+      this.subjectIndex.get(subjectKey)!.add(item.id);
     }
-    this.subjectIndex.get(subjectKey)!.add(item.id);
 
     // Tag index
     item.tags.forEach((tag) => {
@@ -822,7 +871,8 @@ export class KnowledgeManagementSystem extends EventEmitter {
   ): Record<string, number> {
     const grouped: Record<string, number> = {};
     items.forEach((item) => {
-      grouped[item.confidenceLevel] = (grouped[item.confidenceLevel] || 0) + 1;
+      const level = item.confidenceLevel || 'unknown';
+      grouped[level] = (grouped[level] || 0) + 1;
     });
     return grouped;
   }
@@ -833,7 +883,8 @@ export class KnowledgeManagementSystem extends EventEmitter {
   ): Array<{ subject: string; count: number }> {
     const subjectCounts: Record<string, number> = {};
     items.forEach((item) => {
-      subjectCounts[item.subject] = (subjectCounts[item.subject] || 0) + 1;
+      const subject = item.subject || 'unknown';
+      subjectCounts[subject] = (subjectCounts[subject] || 0) + 1;
     });
 
     return Object.entries(subjectCounts)
@@ -861,7 +912,11 @@ export class KnowledgeManagementSystem extends EventEmitter {
   public getKnowledge(id: string): KnowledgeItem | null {
     const knowledge = this.knowledgeBase.get(id);
     if (knowledge) {
-      knowledge.accessCount++;
+      if (knowledge.accessCount !== undefined) {
+        knowledge.accessCount++;
+      } else {
+        knowledge.accessCount = 1;
+      }
       knowledge.lastAccessed = new Date();
       return knowledge;
     }

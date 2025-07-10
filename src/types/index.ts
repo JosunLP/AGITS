@@ -288,13 +288,17 @@ export interface ResponseMetadata {
 
 // Configuration types
 export interface ServiceConfig {
-  name: string;
-  version: string;
+  enabled?: boolean;
+  name?: string;
+  version?: string;
   port: number;
-  environment: Environment;
-  dependencies: ServiceDependency[];
-  resources: ResourceLimits;
-  monitoring: MonitoringConfig;
+  instances?: number;
+  healthCheckPath?: string;
+  environment?: Environment;
+  dependencies?: ServiceDependency[];
+  resources?: ResourceLimits;
+  monitoring?: MonitoringConfig;
+  config?: Record<string, any>;
 }
 
 export enum Environment {
@@ -396,4 +400,34 @@ export interface ValidationCriteria {
   expectedValue: any;
   tolerance: number;
   required: boolean;
+}
+
+// Knowledge Management types
+export interface KnowledgeItem {
+  id: string;
+  type: string;
+  content: any;
+  source: string;
+  confidence: number;
+  confidenceLevel?: string; // Optional for compatibility
+  sources?: string[]; // Optional for compatibility
+  tags: string[];
+  metadata: Record<string, any>;
+  createdAt: Date;
+  updatedAt: Date;
+  lastAccessed?: Date;
+  accessCount?: number; // Optional for compatibility
+  subject?: string;
+  description?: string; // Optional for compatibility
+  verification?: any; // Optional for compatibility
+  relationships: KnowledgeRelationship[];
+}
+
+export interface KnowledgeRelationship {
+  targetId: string;
+  type: string;
+  weight: number;
+  strength?: number;
+  confidence?: number; // Optional for compatibility
+  metadata?: Record<string, any>;
 }

@@ -606,11 +606,12 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
     const subjectGroups = this.groupKnowledgeBySubject(knowledge);
 
     // Create pattern knowledge items
-    Object.entries(typeGroups).forEach(([type, items]) => {
+    for (const [type, items] of Object.entries(typeGroups)) {
       if (items.length > 3) {
-        const patternId = this.knowledgeSystem.addKnowledge({
+        const patternId = await this.knowledgeSystem.addKnowledge({
           type: 'CONCEPTUAL' as any,
           content: { pattern: `${type}_frequency`, items: items.length },
+          source: 'pattern_discovery', // Add required source field
           subject: `Pattern: ${type} frequency`,
           description: `Identified pattern of ${type} knowledge items`,
           confidence: Math.min(items.length / 10, 1),
@@ -634,7 +635,7 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
         patterns.push({ type, count: items.length });
         knowledgeIds.push(patternId);
       }
-    });
+    }
 
     return {
       items: patterns,
@@ -669,13 +670,14 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
         const similarity = this.calculateKnowledgeSimilarity(item1, item2);
         if (similarity > (task.configuration.similarityThreshold || 0.7)) {
           // Create relationship knowledge
-          const relationshipId = this.knowledgeSystem.addKnowledge({
+          const relationshipId = await this.knowledgeSystem.addKnowledge({
             type: 'CONTEXTUAL' as any,
             content: {
               relationship: 'similar_to',
               items: [item1.id, item2.id],
               similarity,
             },
+            source: 'cross_reference', // Add required source field
             subject: `Relationship: ${item1.subject} ↔ ${item2.subject}`,
             description: `Discovered similarity between knowledge items`,
             confidence: similarity,
@@ -729,9 +731,10 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
       timestamp: new Date(),
     };
 
-    const knowledgeId = this.knowledgeSystem.addKnowledge({
+    const knowledgeId = await this.knowledgeSystem.addKnowledge({
       type: 'FACTUAL' as any,
       content: { systemStats, source: 'sensor_data' },
+      source: 'sensor_data', // Add required source field
       subject: 'System Performance Data',
       description: `System performance snapshot at ${new Date().toISOString()}`,
       confidence: 0.9,

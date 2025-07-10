@@ -1,45 +1,96 @@
 # AGITS - Advanced General Intelligence Technological System
 
-Eine modulare, microservices-basierte AGI-Plattform, die biologische Hirnprinzipien mit modernen Cloud-Native-Technologien kombiniert.
+Eine modulare, microservices-basierte AGI-Plattform mit erweiterten kognitiven Fähigkeiten, persistentem Gedächtnis und autonomen Lernprozessen.
 
 ## 🎯 Projektziele
 
 AGITS ist darauf ausgelegt, eine hochflexible und leistungsstarke AGI-Architektur auf Basis von Open-Source-Werkzeugen zu schaffen. Das System fokussiert sich auf:
 
-- **Autonomes Wissensmanagement**: Kontinuierliches Sammeln, Verarbeiten und Lernen aus Daten
-- **Selbstständige Lernprozesse**: Regelmäßige automatisierte Lernzyklen während der Laufzeit
-- **Cognitive Services**: Reasoning, Attention Management, Decision Making, Natural Language Processing
+- **Autonomes Wissensmanagement**: Kontinuierliches Sammeln, Verarbeiten und Lernen aus Daten mit persistenter Speicherung
+- **Selbstständige Lernprozesse**: Regelmäßige automatisierte Lernzyklen mit adaptiver Anpassung während der Laufzeit
+- **Erweiterte Cognitive Services**: Verbessertes Reasoning, Memory Consolidation, Decision Making mit Konfidenz-Tracking
+- **Persistentes Gedächtnissystem**: Kurz-, Mittel- und Langzeitgedächtnis mit automatischer Konsolidierung und Pruning
 - **Biologisch-inspirierte Architektur**: Neurowissenschaftliche Prinzipien in der Systemarchitektur
 - **Evolutionäre Selbstoptimierung**: Das System verbessert kontinuierlich seine eigenen Fähigkeiten
+
+## 🆕 Neue Features (2025)
+
+### Erweitertes Gedächtnissystem
+
+- **Memory Consolidation**: Automatische Übertragung wichtiger Informationen vom Arbeitsgedächtnis in das Langzeitgedächtnis
+- **Synaptic Pruning**: Intelligente Entfernung unwichtiger oder veralteter Gedächtnisinhalte
+- **Memory Maintenance**: Kontinuierliche Gedächtnispflege mit konfigurierbaren Intervallen
+- **Persistente Speicherung**: MongoDB, Neo4j und Redis-Integration für dauerhafte Datenspeicherung
+
+### Erweiterte Reasoning Engine
+
+- **Chain-of-Thought Reasoning**: Schrittweise logische Argumentationsketten
+- **Multi-Type Reasoning**: Deduktive, induktive, abduktive, analogische und kausale Schlussfolgerungen
+- **Confidence Tracking**: Vertrauen und Gewissheitslevel für alle Reasoning-Ergebnisse
+- **Reasoning History**: Vollständige Nachverfolgung aller Denkprozesse
+
+### Autonome Lernprozesse
+
+- **Adaptive Learning Cycles**: Selbstanpassende Lernzyklen basierend auf Performance
+- **Learning Metrics**: Detaillierte Metriken zu Lernfortschritt und -effizienz
+- **Performance Monitoring**: Kontinuierliche Überwachung und Optimierung der Systemleistung
 
 ## 🏗️ Systemarchitektur
 
 ### Core-Systeme
 
-- **Memory Management**: Hierarchical Temporal Memory mit episodischem und semantischem Gedächtnis
-- **Knowledge Management**: Intelligente Wissensbasis mit semantischen Verbindungen
+- **Memory Management**: Hierarchical Temporal Memory mit episodischem, semantischem und prozeduralem Gedächtnis
+- **Knowledge Management**: Intelligente Wissensbasis mit semantischen Verbindungen und automatischer Optimierung
 - **Chemical Signaling**: Neurotransmitter-ähnliche Kommunikation zwischen Services
 - **Learning Orchestrator**: Koordiniert kontinuierliche Lernprozesse (Supervised, Unsupervised, Reinforcement, Imitation, Active Learning)
-- **Reasoning Engine**: Chain-of-Thought Reasoning mit deduktiver, induktiver und abduktiver Logik
-- **Autonomous Process Scheduler**: Intelligente Aufgabenplanung und -ausführung
+- **Enhanced Reasoning Engine**: Chain-of-Thought Reasoning mit multiplen Reasoning-Typen und Konfidenz-Tracking
+- **Autonomous Process Scheduler**: Intelligente Aufgabenplanung und -ausführung mit priorisierter Warteschlange
 
 ### Cognitive Services
 
 - **Attention Manager**: Dynamische Aufmerksamkeitssteuerung und Ressourcenallokation
-- **Decision Engine**: Autonome Entscheidungsfindung basierend auf Zielen und Constraints
+- **Decision Engine**: Autonome Entscheidungsfindung basierend auf Zielen und Constraints mit Konfidenz-Bewertung
 - **Planning Service**: Hierarchische Aufgabenplanung mit Backtracking und Replanning
 - **Natural Language Processor**: Sprachverständnis und -generierung mit Intent-Erkennung
 
-### Executive Services
+### Infrastructure & Persistence
 
-- **Decision Engine**: Multi-Kriterien-Entscheidungsfindung mit Konfidenz-basierter Bewertung
-- **Planning Service**: Strategische Planung und taktische Ausführung
+- **Data Persistence Layer**: Einheitliche Schnittstelle für MongoDB, Neo4j und Redis
+- **API Controller**: Erweiterte REST-API mit über 50 Endpunkten für alle Systemfunktionen
+- **Health Monitoring**: Umfassendes System-Monitoring mit Performance-Metriken
+- **Service Registry**: Dynamische Service-Entdeckung und -Verwaltung
 
-### Sensory & Model Services
+## 🔧 API-Endpunkte (Erweitert)
 
-- **Data Ingestion**: Multi-modale Datenerfassung und -verarbeitung
-- **Pattern Recognition**: Objekt-, Sprach- und Verhaltensmustererkennung
-- **Model Registry**: Verwaltung und Versionierung von ML-Modellen
+### Gedächtnismanagement
+
+- `POST /api/memory/trigger-consolidation` - Memory Consolidation auslösen
+- `GET /api/memory/maintenance-status` - Status der Gedächtnispflege
+- `POST /api/memory/prune` - Gedächtnisinhalte bereinigen
+
+### Erweiterte Wissensverarbeitung
+
+- `POST /api/knowledge/trigger-collection` - Wissenssammlung auslösen
+- `GET /api/knowledge/collection-stats` - Sammlungsstatistiken
+- `POST /api/knowledge/optimize` - Wissensoptimierung
+
+### Reasoning & Analytik
+
+- `POST /api/reasoning/chain-of-thought` - Chain-of-Thought Reasoning
+- `GET /api/reasoning/stats` - Reasoning-Statistiken
+- `GET /api/reasoning/history` - Reasoning-Historie
+
+### Lernen & Performance
+
+- `GET /api/learning/metrics` - Lernmetriken
+- `POST /api/learning/adaptive-cycle` - Adaptive Lernzyklen
+- `GET /api/learning/performance` - Lernleistung
+
+### Autonome Systemsteuerung
+
+- `POST /api/autonomous/start-all` - Alle autonomen Prozesse starten
+- `POST /api/autonomous/stop-all` - Alle autonomen Prozesse stoppen
+- `GET /api/autonomous/status` - Status aller autonomen Prozesse
 
 ## 🚀 Installation & Setup
 
