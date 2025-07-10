@@ -1,31 +1,13 @@
 import { EventEmitter } from 'events';
 import { DataIngestionService } from '../services/sensory/data-ingestion-service.js';
+import { CollectionStrategy, KnowledgeSourceType } from '../types/index.js';
 import { Logger } from '../utils/logger.js';
 import { KnowledgeManagementSystem } from './knowledge-management.js';
 import { MemoryManagementSystem } from './memory-management.js';
 
 /**
- * Knowledge source types
+ * Knowledge collection configuration
  */
-export enum KnowledgeSourceType {
-  MEMORY_CONSOLIDATION = 'memory_consolidation',
-  EXTERNAL_API = 'external_api',
-  FILE_SYSTEM = 'file_system',
-  SENSOR_DATA = 'sensor_data',
-  USER_INTERACTION = 'user_interaction',
-  PATTERN_DISCOVERY = 'pattern_discovery',
-  CROSS_REFERENCE = 'cross_reference',
-}
-
-/**
- * Collection strategy
- */
-export enum CollectionStrategy {
-  CONTINUOUS = 'continuous',
-  SCHEDULED = 'scheduled',
-  EVENT_DRIVEN = 'event_driven',
-  THRESHOLD_BASED = 'threshold_based',
-}
 
 /**
  * Knowledge collection task
@@ -611,7 +593,7 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
         const patternId = await this.knowledgeSystem.addKnowledge({
           type: 'CONCEPTUAL' as any,
           content: { pattern: `${type}_frequency`, items: items.length },
-          source: 'pattern_discovery', // Add required source field
+          source: KnowledgeSourceType.PATTERN_DISCOVERY, // Add required source field
           subject: `Pattern: ${type} frequency`,
           description: `Identified pattern of ${type} knowledge items`,
           confidence: Math.min(items.length / 10, 1),
@@ -626,6 +608,16 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
             supportingEvidence: [],
           },
           metadata: {
+            domain: 'pattern_analysis',
+            complexity: 0.6,
+            importance: 0.7,
+            frequency: items.length,
+            context: { task: task.id },
+            derivedFrom: [],
+            relatedConcepts: [],
+            applications: ['pattern_recognition'],
+            limitations: [],
+            assumptions: ['frequency_indicates_importance'],
             patternType: 'frequency',
             discoveredAt: new Date(),
             sourceTask: task.id,
@@ -677,7 +669,7 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
               items: [item1.id, item2.id],
               similarity,
             },
-            source: 'cross_reference', // Add required source field
+            source: KnowledgeSourceType.CROSS_REFERENCE, // Add required source field
             subject: `Relationship: ${item1.subject} ↔ ${item2.subject}`,
             description: `Discovered similarity between knowledge items`,
             confidence: similarity,
@@ -687,11 +679,19 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
             relationships: [],
             verification: {
               isVerified: false,
-              verificationScore: 0,
-              contradictions: [],
-              supportingEvidence: [],
+              verificationMethod: 'automatic',
             },
             metadata: {
+              domain: 'knowledge_relationships',
+              complexity: 0.5,
+              importance: 0.6,
+              frequency: 1,
+              context: { similarity: similarity, task: task.id },
+              derivedFrom: [item1.id, item2.id],
+              relatedConcepts: [],
+              applications: ['knowledge_graph'],
+              limitations: ['similarity_threshold'],
+              assumptions: ['content_similarity_indicates_relationship'],
               relationshipType: 'similarity',
               discoveredAt: new Date(),
               sourceTask: task.id,
@@ -734,7 +734,7 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
     const knowledgeId = await this.knowledgeSystem.addKnowledge({
       type: 'FACTUAL' as any,
       content: { systemStats, source: 'sensor_data' },
-      source: 'sensor_data', // Add required source field
+      source: KnowledgeSourceType.SENSOR_DATA, // Add required source field
       subject: 'System Performance Data',
       description: `System performance snapshot at ${new Date().toISOString()}`,
       confidence: 0.9,
