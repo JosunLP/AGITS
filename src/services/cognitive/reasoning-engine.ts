@@ -3,6 +3,8 @@ import {
   APIResponse,
   CognitiveTask,
   ProcessingContext,
+  ProcessPriority,
+  ResourceType,
   TaskType,
 } from '../../types/index.js';
 import { EventMap, TypedEventEmitter } from '../../utils/event-emitter.js';
@@ -735,6 +737,107 @@ export class ReasoningEngineService extends TypedEventEmitter<ReasoningEngineEve
     } catch (error) {
       this.logger.error('Error persisting reasoning result:', error);
     }
+  }
+
+  /**
+   * Public method for performing reasoning - called by API Controller
+   */
+  public async performReasoning(
+    query: string,
+    context?: any,
+    reasoningType?: ReasoningType
+  ): Promise<APIResponse<ReasoningResult>> {
+    const task: CognitiveTask = {
+      id: `reasoning_${Date.now()}`,
+      type: TaskType.REASONING,
+      priority: ProcessPriority.NORMAL,
+      requiredResources: [
+        {
+          type: ResourceType.MEMORY,
+          amount: 100,
+          unit: 'MB',
+          priority: ProcessPriority.NORMAL,
+        },
+        {
+          type: ResourceType.CPU,
+          amount: 50,
+          unit: '%',
+          priority: ProcessPriority.NORMAL,
+        },
+      ],
+      input: {
+        query,
+        context,
+        reasoningType,
+      },
+      context: {
+        sessionId: `session_${Date.now()}`,
+        environment: context || {},
+        goals: [],
+        constraints: [],
+        metadata: {},
+      },
+      dependencies: [],
+      status: 'pending',
+      createdAt: new Date(),
+    };
+
+    return this.processReasoningTask(task);
+  }
+
+  /**
+   * Public method for analogical reasoning
+   */
+  public async analogicalReasoning(
+    sourceCase: any,
+    targetProblem: any,
+    context?: any
+  ): Promise<APIResponse<ReasoningResult>> {
+    const task: CognitiveTask = {
+      id: `analogical_${Date.now()}`,
+      type: TaskType.REASONING,
+      priority: ProcessPriority.NORMAL,
+      requiredResources: [
+        {
+          type: ResourceType.MEMORY,
+          amount: 100,
+          unit: 'MB',
+          priority: ProcessPriority.NORMAL,
+        },
+        {
+          type: ResourceType.CPU,
+          amount: 50,
+          unit: '%',
+          priority: ProcessPriority.NORMAL,
+        },
+      ],
+      input: {
+        query: targetProblem,
+        context: { ...context, sourceCase },
+        reasoningType: ReasoningType.ANALOGICAL,
+      },
+      context: {
+        sessionId: `session_${Date.now()}`,
+        environment: context || {},
+        goals: [],
+        constraints: [],
+        metadata: {},
+      },
+      dependencies: [],
+      status: 'pending',
+      createdAt: new Date(),
+    };
+
+    return this.processReasoningTask(task);
+  }
+
+  /**
+   * Clear reasoning history
+   */
+  public clearHistory(): void {
+    this.reasoningHistory.clear();
+    this.reasoningTasks.clear();
+    this.logger.info('Reasoning history cleared');
   }
 
   // Helper methods

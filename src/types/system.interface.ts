@@ -6,6 +6,7 @@ import {
   AutonomousProcessType,
   Environment,
   HealthStatus,
+  LogLevel,
   MessagePriority,
   NeurotransmitterType,
   ProcessPriority,
@@ -412,15 +413,27 @@ export interface Risk {
 }
 
 export interface ServiceConfig {
+  name: string;
+  version: string;
+  environment: Environment;
+  port?: number;
+  host?: string;
+  logLevel: LogLevel;
+  enableMetrics: boolean;
+  enableHealthCheck: boolean;
   enabled: boolean;
-  port: number;
-  instances: number;
-  healthCheckPath: string;
-  config: Record<string, any>;
-  name?: string;
-  version?: string;
-  environment?: Environment;
-  dependencies?: string[];
-  resources?: Record<string, string>;
-  monitoring?: Record<string, any>;
+  instances?: number;
+  healthCheckPath?: string;
+  config?: Record<string, any>;
+  dependencies: string[];
+  features: string[];
+  resources: {
+    maxMemory: number;
+    maxCpu: number;
+    maxConnections: number;
+    cpu?: string;
+    memory?: string;
+    storage?: string;
+    network?: string;
+  };
 }

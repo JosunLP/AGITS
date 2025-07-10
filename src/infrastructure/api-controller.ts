@@ -11,11 +11,15 @@ import { NaturalLanguageProcessor } from '../services/communication/nlp-service.
 import { DecisionEngine } from '../services/executive/decision-engine.js';
 import { PlanningService } from '../services/executive/planning-service.js';
 import {
+  CognitiveTask,
   ConsolidationPhase,
   LearningExperience,
   LearningType,
   MemoryPriority,
   MemoryType,
+  ProcessPriority,
+  ResourceType,
+  TaskType,
 } from '../types/index.js';
 import { Logger } from '../utils/logger.js';
 
@@ -1485,14 +1489,35 @@ export class APIController {
         });
       }
 
-      const reasoningTaskRequest = {
-        type: 'DEDUCTIVE' as any, // Cast to ReasoningType
-        query: problem || 'Analyze the given context',
-        context: {
-          ...context,
-          options: options || {},
+      const reasoningTaskRequest: CognitiveTask = {
+        id: `reasoning_${Date.now()}`,
+        type: TaskType.REASONING,
+        priority: ProcessPriority.NORMAL,
+        requiredResources: [
+          {
+            type: ResourceType.MEMORY,
+            amount: 100,
+            unit: 'MB',
+            priority: ProcessPriority.NORMAL,
+          },
+        ],
+        input: {
+          query: problem || 'Analyze the given context',
+          context: {
+            ...context,
+            options: options || {},
+          },
         },
-        priority: 1,
+        context: {
+          sessionId: `session_${Date.now()}`,
+          environment: context || {},
+          goals: [],
+          constraints: [],
+          metadata: {},
+        },
+        dependencies: [],
+        status: 'pending',
+        createdAt: new Date(),
       };
 
       const result =
@@ -1502,15 +1527,20 @@ export class APIController {
         success: true,
         data: {
           taskId: `reasoning_${Date.now()}`,
-          result: result.conclusion,
-          confidence: result.confidence,
-          reasoning:
-            result.reasoning_chain
-              ?.map((step) => step.conclusion)
-              .join(' -> ') || 'Analysis completed',
-          processingTime: result.execution_time,
-          type: result.type,
-          certainty: result.certainty_level,
+          result: result.success
+            ? result.data?.conclusion || 'Analysis completed'
+            : 'Analysis failed',
+          confidence: result.success ? result.data?.confidence || 0.5 : 0,
+          reasoning: result.success
+            ? (result.data as any)?.reasoning_chain
+                ?.map((step: any) => step.conclusion)
+                .join(' -> ') || 'Analysis completed'
+            : 'Analysis failed',
+          processingTime: result.success ? result.data?.execution_time || 0 : 0,
+          type: result.success ? result.data?.type || 'deductive' : 'unknown',
+          certainty: result.success
+            ? result.data?.certainty_level || 'moderate'
+            : 'very_low',
         },
       });
     } catch (error) {

@@ -152,7 +152,13 @@ export class ChemicalSignalingSystem extends TypedEventEmitter<ChemicalSignaling
       }
     }
 
-    return messages.sort((a, b) => b.priority - a.priority);
+    return messages.sort((a, b) => {
+      const priorityA =
+        typeof a.priority === 'number' ? a.priority : Number(a.priority);
+      const priorityB =
+        typeof b.priority === 'number' ? b.priority : Number(b.priority);
+      return priorityB - priorityA;
+    });
   }
 
   /**

@@ -24,7 +24,14 @@ export * from './learning.type.js';
 // System types and interfaces
 export * from './system.interface.js';
 export {
+  AutonomousProcessType,
+  Environment,
+  LogLevel,
+  MessagePriority,
+  ModalityType,
+  NeurotransmitterType,
   ProcessPriority,
+  ProcessingStage,
   ResourceType,
   ServiceStatus,
   TaskType,

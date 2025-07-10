@@ -146,10 +146,23 @@ export class AppConfig {
   private loadServiceConfigs(): void {
     // Load service-specific configurations
     this.services['memory'] = {
+      name: 'memory',
+      version: '1.0.0',
+      environment: Environment.DEVELOPMENT,
       enabled: true,
       port: parseInt(process.env.MEMORY_SERVICE_PORT || '3001', 10),
       instances: parseInt(process.env.MEMORY_SERVICE_INSTANCES || '1', 10),
       healthCheckPath: '/health',
+      logLevel: LogLevel.INFO,
+      enableMetrics: true,
+      enableHealthCheck: true,
+      dependencies: [],
+      features: ['consolidation', 'decay', 'pruning'],
+      resources: {
+        maxMemory: 512,
+        maxCpu: 50,
+        maxConnections: 100,
+      },
       config: {
         consolidationInterval: this.learning.memoryConsolidationInterval,
         decayInterval: this.learning.synapticDecayInterval,
@@ -158,10 +171,23 @@ export class AppConfig {
     };
 
     this.services['knowledge'] = {
+      name: 'knowledge',
+      version: '1.0.0',
+      environment: Environment.DEVELOPMENT,
       enabled: true,
       port: parseInt(process.env.KNOWLEDGE_SERVICE_PORT || '3002', 10),
       instances: parseInt(process.env.KNOWLEDGE_SERVICE_INSTANCES || '1', 10),
       healthCheckPath: '/health',
+      logLevel: LogLevel.INFO,
+      enableMetrics: true,
+      enableHealthCheck: true,
+      dependencies: [],
+      features: ['extraction', 'inference'],
+      resources: {
+        maxMemory: 512,
+        maxCpu: 50,
+        maxConnections: 100,
+      },
       config: {
         extractionInterval: this.learning.knowledgeExtractionInterval,
         confidenceThreshold: this.learning.confidenceThreshold,
@@ -169,10 +195,23 @@ export class AppConfig {
     };
 
     this.services['learning'] = {
+      name: 'learning',
+      version: '1.0.0',
+      environment: Environment.DEVELOPMENT,
       enabled: true,
       port: parseInt(process.env.LEARNING_SERVICE_PORT || '3003', 10),
       instances: parseInt(process.env.LEARNING_SERVICE_INSTANCES || '1', 10),
       healthCheckPath: '/health',
+      logLevel: LogLevel.INFO,
+      enableMetrics: true,
+      enableHealthCheck: true,
+      dependencies: [],
+      features: ['adaptive', 'reinforcement'],
+      resources: {
+        maxMemory: 512,
+        maxCpu: 50,
+        maxConnections: 100,
+      },
       config: {
         learningRate: this.learning.learningRate,
         batchSize: this.learning.batchSize,
@@ -181,10 +220,23 @@ export class AppConfig {
     };
 
     this.services['reasoning'] = {
+      name: 'reasoning',
+      version: '1.0.0',
+      environment: Environment.DEVELOPMENT,
       enabled: true,
       port: parseInt(process.env.REASONING_SERVICE_PORT || '3004', 10),
       instances: parseInt(process.env.REASONING_SERVICE_INSTANCES || '1', 10),
       healthCheckPath: '/health',
+      logLevel: LogLevel.INFO,
+      enableMetrics: true,
+      enableHealthCheck: true,
+      dependencies: [],
+      features: ['deductive', 'inductive', 'analogical'],
+      resources: {
+        maxMemory: 512,
+        maxCpu: 50,
+        maxConnections: 100,
+      },
       config: {
         maxDepth: this.cognitive.maxReasoningDepth,
         chainOfThought: this.cognitive.chainOfThoughtEnabled,
@@ -193,10 +245,23 @@ export class AppConfig {
     };
 
     this.services['attention'] = {
+      name: 'attention',
+      version: '1.0.0',
+      environment: Environment.DEVELOPMENT,
       enabled: true,
       port: parseInt(process.env.ATTENTION_SERVICE_PORT || '3005', 10),
       instances: parseInt(process.env.ATTENTION_SERVICE_INSTANCES || '1', 10),
       healthCheckPath: '/health',
+      logLevel: LogLevel.INFO,
+      enableMetrics: true,
+      enableHealthCheck: true,
+      dependencies: [],
+      features: ['focus', 'switching'],
+      resources: {
+        maxMemory: 512,
+        maxCpu: 50,
+        maxConnections: 100,
+      },
       config: {
         updateInterval: this.cognitive.attentionUpdateInterval,
         maxTargets: this.cognitive.maxAttentionTargets,
@@ -205,10 +270,23 @@ export class AppConfig {
     };
 
     this.services['decision'] = {
+      name: 'decision',
+      version: '1.0.0',
+      environment: Environment.DEVELOPMENT,
       enabled: true,
       port: parseInt(process.env.DECISION_SERVICE_PORT || '3006', 10),
       instances: parseInt(process.env.DECISION_SERVICE_INSTANCES || '1', 10),
       healthCheckPath: '/health',
+      logLevel: LogLevel.INFO,
+      enableMetrics: true,
+      enableHealthCheck: true,
+      dependencies: [],
+      features: ['optimization', 'multi-criteria'],
+      resources: {
+        maxMemory: 512,
+        maxCpu: 50,
+        maxConnections: 100,
+      },
       config: {
         loopInterval: this.cognitive.decisionLoopInterval,
         maxDecisionTime: this.cognitive.maxDecisionTimeMs,
@@ -217,10 +295,23 @@ export class AppConfig {
     };
 
     this.services['nlp'] = {
+      name: 'nlp',
+      version: '1.0.0',
+      environment: Environment.DEVELOPMENT,
       enabled: true,
       port: parseInt(process.env.NLP_SERVICE_PORT || '3007', 10),
       instances: parseInt(process.env.NLP_SERVICE_INSTANCES || '1', 10),
       healthCheckPath: '/health',
+      logLevel: LogLevel.INFO,
+      enableMetrics: true,
+      enableHealthCheck: true,
+      dependencies: [],
+      features: ['tokenization', 'sentiment', 'entities'],
+      resources: {
+        maxMemory: 512,
+        maxCpu: 50,
+        maxConnections: 100,
+      },
       config: {
         maxResponseLength: this.cognitive.maxResponseLength,
         contextWindowSize: this.cognitive.contextWindowSize,

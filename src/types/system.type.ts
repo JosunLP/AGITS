@@ -2,6 +2,60 @@
  * System-related types and enums
  */
 
+export enum Environment {
+  DEVELOPMENT = 'development',
+  TESTING = 'testing',
+  STAGING = 'staging',
+  PRODUCTION = 'production',
+}
+
+export enum LogLevel {
+  TRACE = 'trace',
+  DEBUG = 'debug',
+  INFO = 'info',
+  WARN = 'warn',
+  ERROR = 'error',
+  FATAL = 'fatal',
+}
+
+export enum MessagePriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
+}
+
+export enum NeurotransmitterType {
+  DOPAMINE = 'dopamine',
+  SEROTONIN = 'serotonin',
+  ACETYLCHOLINE = 'acetylcholine',
+  NOREPINEPHRINE = 'norepinephrine',
+  GABA = 'gaba',
+  GLUTAMATE = 'glutamate',
+}
+
+export enum ModalityType {
+  TEXT = 'text',
+  TEXTUAL = 'textual',
+  IMAGE = 'image',
+  AUDIO = 'audio',
+  VIDEO = 'video',
+  SENSOR = 'sensor',
+  SENSORY = 'sensory',
+  STRUCTURED = 'structured',
+  TEMPORAL = 'temporal',
+  SPATIAL = 'spatial',
+}
+
+export enum ProcessingStage {
+  RAW = 'raw',
+  PREPROCESSED = 'preprocessed',
+  PROCESSED = 'processed',
+  ANALYZED = 'analyzed',
+  VALIDATED = 'validated',
+  STORED = 'stored',
+}
+
 export enum ServiceStatus {
   STARTING = 'starting',
   RUNNING = 'running',
@@ -57,24 +111,6 @@ export enum AutonomousProcessType {
   CHEMICAL_SIGNALING = 'chemical_signaling',
 }
 
-export enum NeurotransmitterType {
-  DOPAMINE = 'dopamine',
-  SEROTONIN = 'serotonin',
-  NOREPINEPHRINE = 'norepinephrine',
-  ACETYLCHOLINE = 'acetylcholine',
-  GABA = 'gaba',
-  GLUTAMATE = 'glutamate',
-  OXYTOCIN = 'oxytocin',
-  ENDORPHIN = 'endorphin',
-}
-
-export enum MessagePriority {
-  LOW = 0,
-  NORMAL = 1,
-  HIGH = 2,
-  CRITICAL = 3,
-}
-
 export enum HealthStatus {
   HEALTHY = 'healthy',
   WARNING = 'warning',
@@ -89,62 +125,6 @@ export enum MetricType {
   HISTOGRAM = 'histogram',
   SUMMARY = 'summary',
   RATE = 'rate',
-}
-
-export enum Environment {
-  DEVELOPMENT = 'development',
-  TESTING = 'testing',
-  STAGING = 'staging',
-  PRODUCTION = 'production',
-}
-
-export enum LogLevel {
-  DEBUG = 'debug',
-  INFO = 'info',
-  WARN = 'warn',
-  ERROR = 'error',
-  FATAL = 'fatal',
-}
-
-export enum ServiceConfigEnum {
-  API_PORT = 'api_port',
-  DB_CONNECTION = 'db_connection',
-  MAX_MEMORY = 'max_memory',
-  LOG_LEVEL = 'log_level',
-  ENVIRONMENT = 'environment',
-}
-
-export enum DataModality {
-  TEXT = 'text',
-  IMAGE = 'image',
-  AUDIO = 'audio',
-  VIDEO = 'video',
-  SENSOR = 'sensor',
-  MULTIMODAL = 'multimodal',
-}
-
-export enum ModalityType {
-  VISUAL = 'visual',
-  AUDITORY = 'auditory',
-  TEXTUAL = 'textual',
-  SENSORY = 'sensory',
-  TEMPORAL = 'temporal',
-  SPATIAL = 'spatial',
-  TEXT = 'text',
-  IMAGE = 'image',
-  AUDIO = 'audio',
-  VIDEO = 'video',
-  SENSOR = 'sensor',
-  STRUCTURED = 'structured',
-}
-
-export enum ProcessingStage {
-  RAW = 'raw',
-  PREPROCESSED = 'preprocessed',
-  FEATURES_EXTRACTED = 'features_extracted',
-  NORMALIZED = 'normalized',
-  VALIDATED = 'validated',
-  READY = 'ready',
 }
 
 /**

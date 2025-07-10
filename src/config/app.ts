@@ -365,8 +365,15 @@ export class AppConfig {
       version: process.env.SERVICE_VERSION || '1.0.0',
       port: this.port,
       environment: this.environment,
+      logLevel: this.logLevel,
+      enableMetrics: true,
+      enableHealthCheck: true,
       dependencies: [],
+      features: ['cognitive', 'memory', 'reasoning'],
       resources: {
+        maxMemory: 512,
+        maxCpu: 50,
+        maxConnections: 100,
         cpu: process.env.CPU_LIMIT || '1000m',
         memory: process.env.MEMORY_LIMIT || '512Mi',
         storage: process.env.STORAGE_LIMIT || '1Gi',
@@ -375,8 +382,7 @@ export class AppConfig {
       enabled: true,
       instances: 1,
       healthCheckPath: '/health',
-      config: {},
-      monitoring: {
+      config: {
         metricsEnabled: this.monitoring.prometheusEnabled,
         tracingEnabled: this.monitoring.tracingEnabled,
         loggingLevel: this.logLevel,

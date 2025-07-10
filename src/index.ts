@@ -98,10 +98,7 @@ export class AGITSPlatform {
     this.autonomousScheduler = new AutonomousProcessScheduler();
 
     // Initialize cognitive services
-    this.reasoningEngine = new ReasoningEngineService(
-      appConfig.cognitive,
-      this.persistenceLayer
-    );
+    this.reasoningEngine = new ReasoningEngineService(this.persistenceLayer);
     this.learningOrchestrator = new LearningOrchestrator(this.memorySystem);
     this.attentionManager = new AttentionManager(this.chemicalSignaling);
 
@@ -120,19 +117,10 @@ export class AGITSPlatform {
     const dataIngestionService = new DataIngestionService();
 
     // Initialize autonomous knowledge collector
-    this.knowledgeCollector = new AutonomousKnowledgeCollector(
-      this.knowledgeSystem,
-      this.memorySystem,
-      dataIngestionService
-    );
+    this.knowledgeCollector = new AutonomousKnowledgeCollector();
 
     // Initialize enhanced autonomous knowledge collector
-    this.knowledgeCollector = new AutonomousKnowledgeCollector(
-      this.knowledgeSystem,
-      this.memorySystem,
-      dataIngestionService,
-      this.persistenceLayer
-    );
+    this.knowledgeCollector = new AutonomousKnowledgeCollector();
 
     // Initialize API controller
     this.apiController = new APIController(
