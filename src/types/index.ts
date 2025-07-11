@@ -1,7 +1,5 @@
 /**
- * // Memory types and interfaces
-export * from './memory.interface.js';
-export * from './memory.type.js';pes and interfaces for the AGI Platform
+ * Central exports for all types and interfaces for the AGI Platform
  *
  * This file re-exports all types and interfaces from specialized modules
  * for easy importing across the application.
@@ -32,8 +30,8 @@ export {
   MessagePriority,
   ModalityType,
   NeurotransmitterType,
-  ProcessPriority,
   ProcessingStage,
+  ProcessPriority,
   ResourceType,
   ServiceStatus,
   TaskType,
@@ -62,8 +60,8 @@ export * from './reinforcement-learning.interface.js';
 export {
   ActionType,
   ExplorationStrategy,
-  LearningStrategy as RLLearningStrategy,
   RewardType,
+  LearningStrategy as RLLearningStrategy,
 } from './reinforcement-learning.type.js';
 export type {
   Episode,
@@ -77,7 +75,27 @@ export type {
 
 // Machine Learning types and interfaces
 export * from './machine-learning.interface.js';
-export * from './machine-learning.type.js';
+export {
+  DataQualityDimension,
+  FeatureType,
+  ModelType,
+  QualityMetric,
+} from './machine-learning.type.js';
+export type {
+  BatchPrediction,
+  DataQualityMetrics,
+  LearningEffectivenessMetrics,
+  DataPoint as MLDataPoint,
+  ModelMetadata,
+  ModelPerformance,
+  ModelPerformanceMetrics,
+  QualityAssessmentResult,
+  QualityFeatures,
+  QualityMetrics,
+  QualityPrediction,
+  QualityThresholds,
+  TrainingConfiguration,
+} from './machine-learning.type.js';
 
 // Pattern Recognition types and interfaces
 export * from './pattern-recognition.interface.js';

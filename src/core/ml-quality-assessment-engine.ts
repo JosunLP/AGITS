@@ -1,9 +1,9 @@
 /**
  * Machine Learning Quality Assessment Engine
  * Advanced ML-based quality evaluation for knowledge and data
+ * Evaluates data quality, model performance, and learning effectiveness
  */
 
-import { EventEmitter } from 'events';
 import { DataPoint as AcquisitionDataPoint } from '../types/data-acquisition.type.js';
 import {
   BatchPrediction,
@@ -15,14 +15,28 @@ import {
   ModelMetadata,
   ModelPerformance,
   ModelType,
+  QualityAssessmentResult,
   QualityFeatures,
+  QualityMetrics,
   QualityPrediction,
   TrainingConfiguration,
 } from '../types/index.js';
 import { DataPoint as MLDataPoint } from '../types/machine-learning.type.js';
+import { EventMap, TypedEventEmitter } from '../utils/event-emitter.js';
 import { Logger } from '../utils/logger.js';
 
-export class MLQualityAssessmentEngine extends EventEmitter {
+/**
+ * Events emitted by the ML Quality Assessment Engine
+ */
+interface QualityEvents extends EventMap {
+  qualityAssessed: (result: QualityAssessmentResult) => void;
+  qualityImproved: (metrics: QualityMetrics) => void;
+  qualityDegraded: (metrics: QualityMetrics) => void;
+  thresholdExceeded: (threshold: string, value: number) => void;
+  modelTrained: (metadata: ModelMetadata) => void;
+}
+
+export class MLQualityAssessmentEngine extends TypedEventEmitter<QualityEvents> {
   private readonly logger: Logger;
   private readonly featureExtractor: IFeatureExtractor;
   private readonly modelTrainer: IModelTrainer;

@@ -163,3 +163,105 @@ export interface FeatureAnalysis {
   missing: number;
   outliers: number;
 }
+
+/**
+ * Quality Assessment Result
+ */
+export interface QualityAssessmentResult {
+  id: string;
+  type: 'data_quality' | 'model_performance' | 'learning_effectiveness';
+  timestamp: Date;
+  metrics: QualityMetrics;
+  overallScore: number;
+  recommendations: string[];
+  context: Record<string, any>;
+  processingTime: number;
+}
+
+/**
+ * Comprehensive Quality Metrics
+ */
+export interface QualityMetrics {
+  dataQuality?: DataQualityMetrics;
+  modelPerformance?: ModelPerformanceMetrics;
+  learningEffectiveness?: LearningEffectivenessMetrics;
+}
+
+/**
+ * Data Quality Metrics
+ */
+export interface DataQualityMetrics {
+  completeness: number;
+  accuracy: number;
+  consistency: number;
+  freshness: number;
+  relevance: number;
+  duplicateRate: number;
+  outlierRate: number;
+  missingValueRate: number;
+  schemaCompliance: number;
+  dataDistribution: Record<string, number>;
+  overallScore: number;
+}
+
+/**
+ * Model Performance Metrics
+ */
+export interface ModelPerformanceMetrics {
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1Score: number;
+  specificity: number;
+  auc: number;
+  mse: number;
+  mae: number;
+  rmse: number;
+  confidence: number;
+  bias: number;
+  variance: number;
+  overallScore: number;
+}
+
+/**
+ * Learning Effectiveness Metrics
+ */
+export interface LearningEffectivenessMetrics {
+  convergenceRate: number;
+  stabilityScore: number;
+  adaptabilityScore: number;
+  knowledgeRetention: number;
+  transferability: number;
+  learningSpeed: number;
+  plateauResistance: number;
+  generalizationCapacity: number;
+  forgettingRate: number;
+  overallScore: number;
+}
+
+/**
+ * Quality Thresholds
+ */
+export interface QualityThresholds {
+  dataQuality: {
+    completeness: number;
+    accuracy: number;
+    consistency: number;
+    freshness: number;
+    relevance: number;
+  };
+  modelPerformance: {
+    accuracy: number;
+    precision: number;
+    recall: number;
+    f1Score: number;
+    confidence: number;
+  };
+  learningEffectiveness: {
+    convergenceRate: number;
+    stabilityScore: number;
+    adaptabilityScore: number;
+    knowledgeRetention: number;
+    transferability: number;
+  };
+}

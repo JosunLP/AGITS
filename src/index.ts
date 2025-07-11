@@ -1,31 +1,53 @@
 /**
  * AGITS Platform - Main entry point
  * Advanced General Intelligence Technological System
+ *
+ * This file initializes and orchestrates all core systems, services, and autonomous processes
+ * for the AGI platform. It creates a comprehensive cognitive architecture with:
+ * - Persistent memory management with consolidation
+ * - Autonomous knowledge collection and learning
+ * - Advanced reasoning and decision making
+ * - Real-time performance monitoring
+ * - Microservices-based cognitive architecture
  */
 
 import { appConfig } from './config/app.js';
 import { APIController } from './infrastructure/api-controller.js';
+import { DataPersistenceLayer } from './infrastructure/data-persistence-layer.js';
 import { HealthMonitor } from './infrastructure/health-monitor.js';
 import { MetricsCollector } from './infrastructure/metrics-collector.js';
 import { Server } from './infrastructure/server.js';
 import { ServiceRegistry } from './infrastructure/service-registry.js';
 import { Logger } from './utils/logger.js';
 
-// Core cognitive services
+// Core cognitive systems
 import { AutonomousKnowledgeCollector } from './core/autonomous-knowledge-collector.js';
 import { AutonomousProcessScheduler } from './core/autonomous-scheduler.js';
 import { ChemicalSignalingSystem } from './core/chemical-signaling.js';
 import { KnowledgeManagementSystem } from './core/knowledge-management.js';
 import { MemoryManagementSystem } from './core/memory-management.js';
-import { DataPersistenceLayer } from './infrastructure/data-persistence-layer.js';
+import { MLQualityAssessmentEngine } from './core/ml-quality-assessment-engine.js';
+import { PatternRecognitionEngine } from './core/pattern-recognition-engine.js';
+import { PerformanceMonitor } from './core/performance-monitor.js';
+import { ReinforcementLearningAgent } from './core/reinforcement-learning-agent.js';
+
+// Cognitive services
 import { AttentionManager } from './services/cognitive/attention-manager.js';
 import { LearningOrchestrator } from './services/cognitive/learning-orchestrator.js';
 import { ReasoningEngineService } from './services/cognitive/reasoning-engine.js';
+
+// Communication services
 import { NaturalLanguageProcessor } from './services/communication/nlp-service.js';
+
+// Data acquisition services
 import { ExternalApiService } from './services/data-acquisition/external-api.service.js';
 import { WebScrapingService } from './services/data-acquisition/web-scraping.service.js';
+
+// Executive services
 import { DecisionEngine } from './services/executive/decision-engine.js';
 import { PlanningService } from './services/executive/planning-service.js';
+
+// Sensory services
 import { DataIngestionService } from './services/sensory/data-ingestion-service.js';
 
 /**
@@ -38,12 +60,17 @@ export class AGITSPlatform {
   private metricsCollector: MetricsCollector;
   private logger: Logger;
 
-  // Core systems
+  // Core systems - Initialize with persistence layer
   private memorySystem: MemoryManagementSystem;
-  private chemicalSignaling: ChemicalSignalingSystem;
-  private autonomousScheduler: AutonomousProcessScheduler;
   private knowledgeSystem: KnowledgeManagementSystem;
+  private autonomousScheduler: AutonomousProcessScheduler;
   private knowledgeCollector: AutonomousKnowledgeCollector;
+  private chemicalSignaling: ChemicalSignalingSystem;
+  private performanceMonitor: PerformanceMonitor;
+  private patternRecognition: PatternRecognitionEngine;
+  private mlQualityEngine: MLQualityAssessmentEngine;
+  private reinforcementAgent: ReinforcementLearningAgent;
+  private persistenceLayer: DataPersistenceLayer;
 
   // Cognitive services
   private reasoningEngine: ReasoningEngineService;
@@ -388,14 +415,34 @@ export class AGITSPlatform {
  * Main entry point
  */
 async function main() {
-  const platform = new AGITSPlatform();
-  await platform.start();
+  const logger = new Logger('Main');
+
+  try {
+    logger.info('🧠 Starting AGITS Platform...');
+
+    const platform = new AGITSPlatform();
+    await platform.start();
+
+    logger.info('✅ AGITS Platform started successfully');
+    logger.info('📡 API Server running on port 3000');
+    logger.info('🤖 Autonomous processes activated');
+    logger.info('💾 Persistence layer connected');
+    logger.info('🔍 Knowledge collection in progress...');
+  } catch (error) {
+    logger.error('❌ Failed to start AGITS Platform:', error);
+    process.exit(1);
+  }
 }
 
-// Start the platform if this file is run directly
-if (require.main === module) {
+// Start the platform only if this file is run directly
+// Check if this file is the main entry point
+const isMainModule =
+  (process.argv[1] && process.argv[1].endsWith('index.ts')) ||
+  (process.argv[1] && process.argv[1].endsWith('index.js'));
+
+if (isMainModule) {
   main().catch((error) => {
-    console.error('Failed to start AGITS Platform:', error);
+    console.error('Fatal error:', error);
     process.exit(1);
   });
 }

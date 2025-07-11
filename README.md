@@ -13,37 +13,36 @@ AGITS ist darauf ausgelegt, eine hochflexible und leistungsstarke AGI-Architektu
 - **Biologisch-inspirierte Architektur**: Neurowissenschaftliche Prinzipien in der Systemarchitektur
 - **Evolutionäre Selbstoptimierung**: Das System verbessert kontinuierlich seine eigenen Fähigkeiten
 
-## 🆕 Neue Features (2025)
+## 🆕 Neue Features (2025) - Erweitert
 
-### Erweitertes Gedächtnissystem
+### Umfassende ML-Qualitätsbewertung
 
-- **Memory Consolidation**: Automatische Übertragung wichtiger Informationen vom Arbeitsgedächtnis in das Langzeitgedächtnis
-- **Synaptic Pruning**: Intelligente Entfernung unwichtiger oder veralteter Gedächtnisinhalte
-- **Memory Maintenance**: Kontinuierliche Gedächtnispflege mit konfigurierbaren Intervallen
-- **Persistente Speicherung**: MongoDB, Neo4j und Redis-Integration für dauerhafte Datenspeicherung
+- **Multi-dimensionale Datenqualität**: Vollständigkeit, Genauigkeit, Konsistenz, Aktualität, Relevanz
+- **Erweiterte Modellbewertung**: Performance-Metriken, Bias-Erkennung, Varianz-Analyse
+- **Lerneffektivitätsmessung**: Konvergenz, Stabilität, Anpassungsfähigkeit, Wissensretention
+- **Automatische Qualitätsschwellwerte**: Konfigurierbare Qualitätsstandards mit Alerting
+- **Echzeit-Qualitätsmonitoring**: Kontinuierliche Überwachung und Berichterstattung
 
-### Erweiterte Reasoning Engine
+### Selbstoptimierende Systemarchitektur
 
-- **Chain-of-Thought Reasoning**: Schrittweise logische Argumentationsketten
-- **Multi-Type Reasoning**: Deduktive, induktive, abduktive, analogische und kausale Schlussfolgerungen
-- **Confidence Tracking**: Vertrauen und Gewissheitslevel für alle Reasoning-Ergebnisse
-- **Reasoning History**: Vollständige Nachverfolgung aller Denkprozesse
+- **Adaptive Lernparameter**: Automatische Anpassung von Lernraten und Batch-Größen
+- **Performance-gesteuerte Skalierung**: Intelligente Ressourcenverwaltung basierend auf Systemlast
+- **Predictive Maintenance**: Vorhersagebasierte Systemwartung und Optimierung
+- **Emergent Behavior Detection**: Erkennung und Förderung emergenter Intelligenz
 
-### Autonome Lernprozesse
+### Erweiterte Persistierung & Big Data
 
-- **Adaptive Learning Cycles**: Selbstanpassende Lernzyklen basierend auf Performance
-- **Learning Metrics**: Detaillierte Metriken zu Lernfortschritt und -effizienz
-- **Performance Monitoring**: Kontinuierliche Überwachung und Optimierung der Systemleistung
+- **Multi-Database-Integration**: MongoDB, Neo4j, Redis für optimale Datenstrukturen
+- **Automatische Datenpartitionierung**: Intelligente Verteilung großer Datenmengen
+- **Backup & Recovery**: Vollautomatische Datensicherung mit Point-in-Time-Recovery
+- **Data Lifecycle Management**: Automatische Archivierung und Bereinigung alter Daten
 
-### Erweiterte Wissenssammlung
+### Enterprise-Ready Features
 
-- **Web Scraping Integration**: Automatische Sammlung von Wissen aus vertrauenswürdigen Webquellen
-- **External API Integration**: Verbindung zu externen APIs für strukturierte Datensammlung
-- **Trusted Sources Management**: Konfigurierbare vertrauenswürdige Quellen mit Glaubwürdigkeitsbewertung
-- **Quality Assessment**: Automatische Bewertung der Qualität und Relevanz gesammelter Informationen
-- **Enhanced Collection Strategies**: Multiple Sammlungsstrategien (kontinuierlich, geplant, ereignisgesteuert, schwellenwertbasiert)
-- **Rate Limiting & Caching**: Intelligente Ratenbegrenzung und Zwischenspeicherung für optimale Performance
-- **Collection Statistics**: Detaillierte Statistiken und Monitoring der Wissenssammlung
+- **Microservices-Architektur**: Vollständig containerisierte Services mit Service Mesh
+- **API Gateway**: Zentrale API-Verwaltung mit Rate Limiting und Authentication
+- **Monitoring & Observability**: Prometheus, Grafana, Jaeger für umfassendes Monitoring
+- **CI/CD Integration**: GitHub Actions, Docker, Kubernetes für automatische Deployments
 
 ## 🏗️ Systemarchitektur
 
@@ -195,59 +194,128 @@ Das System implementiert mehrere autonome Lernverfahren, die während der Laufze
 - **Response Generation**: Intelligente und kontextuelle Antwortgenerierung
 - **Conversation Management**: Mehrturndialoge mit Kontextverständnis
 
-## ⚡ API-Endpunkte
+## ⚡ API-Endpunkte (Vollständig Erweitert)
 
 ### Gesundheit und Status
 
 - `GET /api/health` - Systemgesundheit prüfen
-- `GET /api/status` - Detaillierter Systemstatus
-- `GET /api/metrics` - Performance-Metriken
+- `GET /api/status` - Detaillierter Systemstatus mit allen Komponenten
+- `GET /api/metrics` - Performance-Metriken und Systemstatistiken
 
 ### Wissensmanagement
 
 - `POST /api/knowledge` - Neues Wissen hinzufügen
-- `GET /api/knowledge/search` - Wissen durchsuchen
+- `GET /api/knowledge/search` - Wissen durchsuchen mit erweiterten Filtern
 - `GET /api/knowledge/:id` - Spezifisches Wissen abrufen
 - `DELETE /api/knowledge/:id` - Wissen entfernen
-- `GET /api/knowledge/stats` - Wissensstatistiken
+- `GET /api/knowledge/stats` - Umfassende Wissensstatistiken
+- `POST /api/knowledge/optimize` - Wissensoptimierung triggern
+- `POST /api/knowledge/trigger-collection` - Manuelle Wissenssammlung
 
-### Gedächtnismanagement
+### Erweiterte Wissenssammlung
+
+- `POST /api/knowledge/collect/web` - Web-Scraping-basierte Wissenssammlung
+- `POST /api/knowledge/collect/api` - API-basierte Datensammlung
+- `POST /api/knowledge/collect/enhanced` - Erweiterte Multi-Source-Sammlung
+- `GET /api/knowledge/sources` - Verfügbare Wissensquellen
+- `GET /api/knowledge/sources/trusted` - Vertrauenswürdige Quellen
+- `GET /api/knowledge/collection-stats` - Detaillierte Sammlungsstatistiken
+
+### Memory Management (Erweitert)
 
 - `POST /api/memory` - Erinnerung speichern
 - `GET /api/memory/search` - Erinnerungen durchsuchen
 - `POST /api/memory/consolidate` - Gedächtniskonsolidierung triggern
-- `GET /api/memory/stats` - Gedächtnisstatistiken
+- `POST /api/memory/trigger-consolidation` - Memory Consolidation auslösen
+- `GET /api/memory/maintenance-status` - Status der Gedächtnispflege
+- `POST /api/memory/prune` - Gedächtnisinhalte bereinigen
+- `GET /api/memory/stats` - Umfassende Gedächtnisstatistiken
 
-### Lernen und Kognition
+### ML-Qualitätsbewertung (Neu)
+
+- `POST /api/quality/assess/data` - Datenqualität bewerten
+- `POST /api/quality/assess/model` - Modellleistung bewerten
+- `POST /api/quality/assess/learning` - Lerneffektivität bewerten
+- `GET /api/quality/thresholds` - Qualitätsschwellwerte abrufen
+- `PUT /api/quality/thresholds` - Qualitätsschwellwerte aktualisieren
+- `GET /api/quality/history` - Qualitätsbewertungshistorie
+- `GET /api/quality/recommendations` - Qualitätsverbesserungsempfehlungen
+
+### Lernen und Kognition (Erweitert)
 
 - `POST /api/learn` - Lernprozess starten
 - `POST /api/learn/experience` - Aus Erfahrung lernen
-- `GET /api/learn/stats` - Lernstatistiken
-- `POST /api/reason` - Reasoning-Aufgabe ausführen
-- `POST /api/reason/chain-of-thought` - Schrittweises Reasoning
-- `POST /api/reason/analogical` - Analogie-basiertes Reasoning
+- `GET /api/learn/stats` - Detaillierte Lernstatistiken
+- `GET /api/learning/metrics` - Umfassende Lernmetriken
+- `POST /api/learning/adaptive-cycle` - Adaptive Lernzyklen starten
+- `GET /api/learning/performance` - Lernleistungsanalyse
 
-### Interaktion und Chat
+### Reasoning & Analytik (Erweitert)
+
+- `POST /api/reason` - Reasoning-Aufgabe ausführen
+- `POST /api/reason/chain-of-thought` - Schrittweises Chain-of-Thought Reasoning
+- `POST /api/reasoning/chain-of-thought` - Erweiterte Chain-of-Thought-Analyse
+- `POST /api/reason/analogical` - Analogie-basiertes Reasoning
+- `GET /api/reasoning/stats` - Reasoning-Statistiken und Performance
+- `GET /api/reasoning/history` - Vollständige Reasoning-Historie
+
+### Interaktion und Chat (Erweitert)
 
 - `POST /api/chat` - Einfache Chat-Interaktion
 - `POST /api/chat/conversation` - Erweiterte Konversation mit NLP
 - `GET /api/chat/conversation/:id/history` - Gesprächsverlauf abrufen
 - `DELETE /api/chat/conversation/:id` - Gesprächsverlauf löschen
+- `POST /api/query` - Allgemeine System-Abfrage
 
-### Entscheidungsfindung und Planung
+### Entscheidungsfindung und Planung (Erweitert)
 
 - `POST /api/decisions/make` - Einfache Entscheidung treffen
 - `POST /api/decisions/complex` - Komplexe Multi-Kriterien-Entscheidung
 - `GET /api/decisions/recent` - Aktuelle Entscheidungen abrufen
+- `GET /api/decisions/analysis` - Entscheidungsanalyse und -bewertung
 - `POST /api/planning/strategic` - Strategischen Plan erstellen
 - `POST /api/planning/:planId/execute` - Plan ausführen
 - `GET /api/planning/goals` - Aktuelle Ziele abrufen
 - `POST /api/planning/goal` - Neues Ziel hinzufügen
 
-### Autonome Prozesse
+### Autonome Prozesse (Vollständig)
 
-- `GET /api/processes/status` - Prozessstatus abrufen
+- `GET /api/processes/status` - Detaillierter Prozessstatus
 - `POST /api/processes/trigger/:type` - Spezifischen Prozess triggern
+- `GET /api/processes/scheduler/stats` - Scheduler-Statistiken
+- `POST /api/autonomous/activate` - Alle autonomen Systeme aktivieren
+- `POST /api/autonomous/deactivate` - Autonome Systeme deaktivieren
+- `GET /api/autonomous/status` - Autonomer Systemstatus
+- `POST /api/autonomous/start-all` - Alle autonomen Prozesse starten
+- `POST /api/autonomous/stop-all` - Alle autonomen Prozesse stoppen
+
+### Aufmerksamkeitsmanagement
+
+- `GET /api/attention/stats` - Detaillierte Aufmerksamkeitsstatistiken
+- `POST /api/attention/focus` - Aufmerksamkeitsfokus setzen
+- `GET /api/attention/distribution` - Aufmerksamkeitsverteilung
+- `POST /api/attention/rebalance` - Aufmerksamkeit neu ausbalancieren
+
+### Performance & Monitoring (Neu)
+
+- `GET /api/performance/metrics` - Umfassende Performance-Metriken
+- `GET /api/performance/recommendations` - Performance-Optimierungsempfehlungen
+- `POST /api/performance/optimize` - Automatische Performance-Optimierung
+- `GET /api/performance/health` - Komponentengesundheit
+- `GET /api/performance/alerts` - Aktive Performance-Alerts
+
+### Chemische Signale
+
+- `GET /api/chemical-signals/stats` - Signalstatistiken
+- `POST /api/chemical-signals/send` - Chemisches Signal senden
+- `GET /api/chemical-signals/history` - Signalhistorie
+
+### Entwicklung & Debug (Neu)
+
+- `GET /api/debug/system-state` - Vollständiger Systemzustand
+- `POST /api/debug/reset-component` - Einzelne Komponente zurücksetzen
+- `GET /api/debug/logs` - System-Logs abrufen
+- `POST /api/debug/simulate-load` - Lasttest simulieren
 - `GET /api/processes/scheduler/stats` - Scheduler-Statistiken
 - `POST /api/autonomous/activate` - Autonome Systeme aktivieren
 - `POST /api/autonomous/deactivate` - Autonome Systeme deaktivieren
