@@ -18,17 +18,22 @@ import { EventMap, TypedEventEmitter } from '../utils/event-emitter.js';
 import { Logger } from '../utils/logger.js';
 
 /**
- * Memory cluster information
+ * Enhanced Memory Cluster with semantic understanding
  */
 interface MemoryCluster {
   id: string;
   members: string[];
   avgStrength: number;
   theme: string;
+  semanticVector: number[];
+  importance: number;
+  lastAccessed: Date;
+  coherenceScore: number;
+  associations: string[];
 }
 
 /**
- * Access pattern tracking
+ * Advanced Access Pattern Tracking
  */
 interface AccessPattern {
   nodeId: string;
@@ -38,16 +43,55 @@ interface AccessPattern {
   accessFrequency: number;
   recentAccess: boolean;
   averageInterval: number;
+  contextualAccess: Map<string, number>;
+  emotionalResonance: number;
+  cognitiveLoad: number;
 }
 
 /**
- * Event map for MemoryManagementSystem
+ * Memory Consolidation Configuration
+ */
+interface ConsolidationConfig {
+  enabled: boolean;
+  intervalMs: number;
+  strengthThreshold: number;
+  maxBatchSize: number;
+  useSemanticClustering: boolean;
+  preserveEpisodic: boolean;
+  compression: {
+    enabled: boolean;
+    algorithm: 'lz4' | 'gzip' | 'brotli';
+    level: number;
+  };
+}
+
+/**
+ * Memory Performance Metrics
+ */
+interface MemoryPerformanceMetrics {
+  totalMemories: number;
+  averageRetrievalTime: number;
+  storageEfficiency: number;
+  consolidationRate: number;
+  forgettingCurve: number[];
+  accessPatternOptimization: number;
+  semanticCoherence: number;
+  memoryFragmentation: number;
+  lastOptimization: Date;
+}
+
+/**
+ * Event map for Enhanced Memory Management System
  */
 interface MemoryEvents extends EventMap {
   memoryStored: (memory: MemoryNode) => void;
   memoryConsolidated: (result: IMemoryConsolidationResult) => void;
   memoryDecayed: (memoryId: string) => void;
   connectionStrengthened: (connection: MemoryConnection) => void;
+  clusterFormed: (cluster: MemoryCluster) => void;
+  memoryOptimized: (metrics: MemoryPerformanceMetrics) => void;
+  forgettingTriggered: (memoryId: string, reason: string) => void;
+  memoryReactivated: (memoryId: string) => void;
   memoryPruned: (memoryId: string) => void;
   memoryUpdated: (memory: MemoryNode) => void;
 }
@@ -132,6 +176,9 @@ export class MemoryManagementSystem
           accessFrequency: 0,
           recentAccess: false,
           averageInterval: 0,
+          contextualAccess: new Map<string, number>(),
+          emotionalResonance: 0.5,
+          cognitiveLoad: 0.3,
         });
       }
 
@@ -181,6 +228,9 @@ export class MemoryManagementSystem
       accessFrequency: 0,
       recentAccess: true,
       averageInterval: 0,
+      contextualAccess: new Map<string, number>(),
+      emotionalResonance: 0.5,
+      cognitiveLoad: 0.3,
     });
 
     // Persist to database
@@ -988,6 +1038,11 @@ export class MemoryManagementSystem
       members: [],
       avgStrength: 0,
       theme: '',
+      semanticVector: [],
+      importance: 0.5,
+      lastAccessed: new Date(),
+      coherenceScore: 0.7,
+      associations: [],
     };
 
     const queue = [startMemoryId];
