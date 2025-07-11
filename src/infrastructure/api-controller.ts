@@ -404,7 +404,8 @@ export class APIController {
         metadata: knowledgeData.metadata || {},
       };
 
-      const knowledgeId = this.knowledgeSystem.addKnowledge(knowledgeItem);
+      const knowledgeId =
+        await this.knowledgeSystem.addKnowledge(knowledgeItem);
 
       reply.code(201).send({
         success: true,
@@ -972,7 +973,7 @@ export class APIController {
         ...memoryData,
       };
 
-      const memoryId = this.memorySystem.storeMemory(memoryNode);
+      const memoryId = await this.memorySystem.storeMemory(memoryNode);
 
       reply.code(201).send({
         success: true,

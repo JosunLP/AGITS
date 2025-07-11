@@ -43,13 +43,18 @@ export class LearningOrchestrator extends TypedEventEmitter<LearningEvents> {
    * Setup memory system event listeners
    */
   private setupMemoryListeners(): void {
-    this.memorySystem.on('memoryStored', (memory) => {
-      this.onMemoryStored(memory);
-    });
+    // Note: Memory system might not have .on() method - handle gracefully
+    if (typeof this.memorySystem.on === 'function') {
+      this.memorySystem.on('memoryStored', (memory) => {
+        this.onMemoryStored(memory);
+      });
 
-    this.memorySystem.on('memoryConsolidated', (memory) => {
-      this.onMemoryConsolidated(memory);
-    });
+      this.memorySystem.on('memoryConsolidated', (memory) => {
+        this.onMemoryConsolidated(memory);
+      });
+    } else {
+      this.logger.warn('Memory system does not support event listeners');
+    }
   }
 
   /**

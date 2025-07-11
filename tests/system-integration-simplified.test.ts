@@ -1,3 +1,4 @@
+import { defaultLearningConfig } from '../src/config/app.js';
 import { AutonomousProcessScheduler } from '../src/core/autonomous-scheduler';
 import { KnowledgeManagementSystem } from '../src/core/knowledge-management';
 import { MemoryManagementSystem } from '../src/core/memory-management';
@@ -5,10 +6,11 @@ import { LearningOrchestrator } from '../src/services/cognitive/learning-orchest
 import { ReasoningEngineService } from '../src/services/cognitive/reasoning-engine';
 import { DecisionEngine } from '../src/services/executive/decision-engine';
 import { PlanningService } from '../src/services/executive/planning-service';
-import { defaultLearningConfig } from '../src/config/app.js';
 import {
+  ConsolidationPhase,
   LearningExperience,
   LearningType,
+  MemoryPriority,
   MemoryType,
 } from '../src/types/index';
 
@@ -24,7 +26,10 @@ describe('AGITS System Integration Tests (Working)', () => {
   beforeEach(() => {
     // Initialize core systems with correct constructor arguments
     memorySystem = new MemoryManagementSystem(defaultLearningConfig);
-    knowledgeSystem = new KnowledgeManagementSystem(memorySystem, defaultLearningConfig);
+    knowledgeSystem = new KnowledgeManagementSystem(
+      memorySystem,
+      defaultLearningConfig
+    );
     scheduler = new AutonomousProcessScheduler();
     learningOrchestrator = new LearningOrchestrator(memorySystem);
     reasoningEngine = new ReasoningEngineService();
@@ -53,19 +58,34 @@ describe('AGITS System Integration Tests (Working)', () => {
   });
 
   describe('Memory Management Integration', () => {
-    it('should store and retrieve memories correctly', () => {
+    it('should store and retrieve memories correctly', async () => {
       const memoryContent = {
         concept: 'test concept',
         description: 'test memory storage',
         context: 'integration test',
       };
 
-      const memoryId = memorySystem.storeMemory({
+      const memoryId = await memorySystem.storeMemory({
         type: MemoryType.SEMANTIC,
         content: memoryContent,
         connections: [],
         strength: 0.8,
-        metadata: { source: 'test' },
+        createdAt: new Date(),
+        decayRate: 0.01,
+        consolidationLevel: 1,
+        priority: MemoryPriority.HIGH,
+        metadata: {
+          source: 'test',
+          tags: ['integration', 'test'],
+          category: 'testing',
+          importance: 0.8,
+          emotionalValence: 0.5,
+          contextualRelevance: 0.7,
+          validationStatus: 'validated',
+          consolidationPhase: ConsolidationPhase.ENCODING,
+          associatedGoals: [],
+          confidence: 0.8,
+        },
       });
 
       expect(memoryId).toBeDefined();
@@ -170,14 +190,29 @@ describe('AGITS System Integration Tests (Working)', () => {
   });
 
   describe('System Health and Monitoring', () => {
-    it('should allow memory operations', () => {
+    it('should allow memory operations', async () => {
       // Test that basic memory operations work
-      const memoryId = memorySystem.storeMemory({
+      const memoryId = await memorySystem.storeMemory({
         type: MemoryType.SEMANTIC,
         content: { test: 'health check' },
         connections: [],
         strength: 0.8,
-        metadata: { source: 'health_test' },
+        createdAt: new Date(),
+        decayRate: 0.01,
+        consolidationLevel: 1,
+        priority: MemoryPriority.NORMAL,
+        metadata: {
+          source: 'health_test',
+          tags: ['health', 'test'],
+          category: 'testing',
+          importance: 0.8,
+          emotionalValence: 0.5,
+          contextualRelevance: 0.7,
+          validationStatus: 'validated',
+          consolidationPhase: ConsolidationPhase.ENCODING,
+          associatedGoals: [],
+          confidence: 0.8,
+        },
       });
 
       const memory = memorySystem.retrieveMemory(memoryId);

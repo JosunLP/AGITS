@@ -219,9 +219,9 @@ export class KnowledgeManagementSystem extends EventEmitter {
   }
 
   /**
-   * Add knowledge item to the knowledge base with persistence
+   * Add knowledge item to the knowledge base with persistence (async version)
    */
-  public async addKnowledge(
+  public async addKnowledgeAsync(
     item: Omit<
       KnowledgeItem,
       'id' | 'createdAt' | 'updatedAt' | 'accessCount' | 'lastAccessed'
@@ -250,6 +250,44 @@ export class KnowledgeManagementSystem extends EventEmitter {
       } catch (error) {
         this.logger.error(`Failed to persist knowledge ${knowledgeId}:`, error);
       }
+    }
+
+    this.logger.debug(`Knowledge added: ${knowledgeId} (${item.type})`);
+    this.emit('knowledgeAdded', knowledgeItem);
+
+    return knowledgeId;
+  }
+
+  /**
+   * Add knowledge item to the knowledge base (synchronous version for tests)
+   */
+  public addKnowledge(
+    item: Omit<
+      KnowledgeItem,
+      'id' | 'createdAt' | 'updatedAt' | 'accessCount' | 'lastAccessed'
+    >
+  ): string {
+    const knowledgeId = `knowledge_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    const knowledgeItem: KnowledgeItem = {
+      id: knowledgeId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      accessCount: 0,
+      lastAccessed: new Date(),
+      ...item,
+      confidenceLevel: this.calculateConfidenceLevel(item.confidence),
+    };
+
+    this.knowledgeBase.set(knowledgeId, knowledgeItem);
+    this.updateIndices(knowledgeItem);
+    this.updateRelationshipGraph(knowledgeItem);
+
+    // Persist to database asynchronously (no await in sync version)
+    if (this.persistenceLayer) {
+      this.persistenceLayer.storeKnowledge(knowledgeItem).catch((error) => {
+        this.logger.error(`Failed to persist knowledge ${knowledgeId}:`, error);
+      });
     }
 
     this.logger.debug(`Knowledge added: ${knowledgeId} (${item.type})`);
@@ -391,7 +429,7 @@ export class KnowledgeManagementSystem extends EventEmitter {
         if (memory && (memory as any).content) {
           const extracted = this.extractFactualKnowledge(memory);
           if (extracted) {
-            const knowledgeId = await this.addKnowledge(extracted);
+            const knowledgeId = await this.addKnowledgeAsync(extracted);
             const knowledgeItem = this.knowledgeBase.get(knowledgeId)!;
             extractedItems.push(knowledgeItem);
           }
@@ -521,13 +559,18 @@ export class KnowledgeManagementSystem extends EventEmitter {
    * Setup memory system event listeners
    */
   private setupMemoryListeners(): void {
-    this.memorySystem.on('memoryStored', (memory) => {
-      this.onMemoryStored(memory);
-    });
+    // Note: Memory system might not have .on() method - handle gracefully
+    if (typeof this.memorySystem.on === 'function') {
+      this.memorySystem.on('memoryStored', (memory) => {
+        this.onMemoryStored(memory);
+      });
 
-    this.memorySystem.on('memoryConsolidated', (memory) => {
-      this.onMemoryConsolidated(memory);
-    });
+      this.memorySystem.on('memoryConsolidated', (memory) => {
+        this.onMemoryConsolidated(memory);
+      });
+    } else {
+      this.logger.warn('Memory system does not support event listeners');
+    }
   }
 
   /**
@@ -538,7 +581,7 @@ export class KnowledgeManagementSystem extends EventEmitter {
     if (memory.strength > this.config.confidenceThreshold) {
       const extracted = this.extractFactualKnowledge(memory);
       if (extracted) {
-        await this.addKnowledge(extracted);
+        await this.addKnowledgeAsync(extracted);
       }
     }
   }

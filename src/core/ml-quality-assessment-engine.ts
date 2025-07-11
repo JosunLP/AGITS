@@ -4,6 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
+import { DataPoint as AcquisitionDataPoint } from '../types/data-acquisition.type.js';
 import {
   BatchPrediction,
   IDataPreprocessor,
@@ -11,7 +12,6 @@ import {
   IInferenceEngine,
   IModelRegistry,
   IModelTrainer,
-  DataPoint as MLDataPoint,
   ModelMetadata,
   ModelPerformance,
   ModelType,
@@ -19,6 +19,7 @@ import {
   QualityPrediction,
   TrainingConfiguration,
 } from '../types/index.js';
+import { DataPoint as MLDataPoint } from '../types/machine-learning.type.js';
 import { Logger } from '../utils/logger.js';
 
 export class MLQualityAssessmentEngine extends EventEmitter {
@@ -179,7 +180,9 @@ export class MLQualityAssessmentEngine extends EventEmitter {
   /**
    * Predict quality for batch of data points
    */
-  async predictBatch(dataPoints: MLDataPoint[]): Promise<BatchPrediction> {
+  async predictBatch(
+    dataPoints: AcquisitionDataPoint[]
+  ): Promise<BatchPrediction> {
     if (!this.currentModel) {
       throw new Error('No trained model available for batch prediction');
     }
@@ -193,14 +196,18 @@ export class MLQualityAssessmentEngine extends EventEmitter {
 
       // Extract features for all data points
       const featuresPromises = dataPoints.map((dp) =>
-        this.extractFeatures(dp.features)
+        this.extractFeatures({ value: dp.value, type: dp.type, ...dp.metadata })
       );
       const allFeatures = await Promise.all(featuresPromises);
 
-      // Prepare batch data
-      const batchData = dataPoints.map((dp, index) => ({
-        ...dp,
-        features: this.featuresToVector(allFeatures[index]),
+      // Prepare batch data with ML format
+      const batchData: MLDataPoint[] = dataPoints.map((dp, index) => ({
+        id: dp.id,
+        features: allFeatures[index],
+        target: undefined, // No target for prediction
+        timestamp: dp.timestamp,
+        source: 'quality-assessment',
+        processed: true,
       }));
 
       // Make batch prediction
@@ -234,7 +241,16 @@ export class MLQualityAssessmentEngine extends EventEmitter {
       throw new Error('No trained model available for evaluation');
     }
 
-    const predictions = await this.predictBatch(testData);
+    // Convert ML data points to acquisition format for prediction
+    const acquisitionTestData: AcquisitionDataPoint[] = testData.map((dp) => ({
+      id: dp.id,
+      value: (dp.target as number) || 0,
+      type: 'evaluation',
+      timestamp: dp.timestamp,
+      metadata: { features: dp.features },
+    }));
+
+    const predictions = await this.predictBatch(acquisitionTestData);
 
     // Calculate performance metrics
     const performance = this.calculatePerformanceMetrics(
