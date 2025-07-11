@@ -1,5 +1,5 @@
-import { EventEmitter } from 'events';
 import { Logger } from '../utils/logger.js';
+import { EventEmitter } from '../utils/node-polyfill.js';
 
 /**
  * Task types for autonomous processes

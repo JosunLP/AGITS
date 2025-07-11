@@ -1,6 +1,6 @@
-import { EventEmitter } from 'events';
 import { ProcessingContext } from '../../types/index.js';
 import { Logger } from '../../utils/logger.js';
+import { EventEmitter } from '../../utils/node-polyfill.js';
 
 /**
  * Natural Language Processing Service - Handles text understanding and generation

@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events';
 import { DataPersistenceLayer } from '../infrastructure/data-persistence-layer.js';
 import { ExternalApiService } from '../services/data-acquisition/external-api.service.js';
 import { WebScrapingService } from '../services/data-acquisition/web-scraping.service.js';
@@ -13,6 +12,7 @@ import {
   KnowledgeType,
 } from '../types/knowledge.type.js';
 import type { Logger } from '../utils/logger.js';
+import { EventEmitter } from '../utils/node-polyfill.js';
 
 /**
  * Collection Priority Level

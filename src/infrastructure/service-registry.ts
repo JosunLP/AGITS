@@ -1,10 +1,10 @@
-import { EventEmitter } from 'events';
 import {
   ServiceHealth,
   ServiceMetrics,
   ServiceStatus,
 } from '../types/index.js';
 import { Logger } from '../utils/logger.js';
+import { EventEmitter } from '../utils/node-polyfill.js';
 
 /**
  * Service registry for managing and discovering services

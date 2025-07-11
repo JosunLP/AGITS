@@ -1,6 +1,6 @@
-import { EventEmitter } from 'events';
 import { Constraint, Goal, ProcessingContext } from '../../types/index.js';
 import { Logger } from '../../utils/logger.js';
+import { EventEmitter } from '../../utils/node-polyfill.js';
 import { DecisionEngine } from './decision-engine.js';
 
 /**

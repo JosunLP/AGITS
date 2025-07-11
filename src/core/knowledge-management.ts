@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events';
 import { LearningConfig } from '../config/app.js';
 import { DataPersistenceLayer } from '../infrastructure/data-persistence-layer.js';
 import {
@@ -8,6 +7,7 @@ import {
   ValidationMethod,
 } from '../types/index.js';
 import { Logger } from '../utils/logger.js';
+import { EventEmitter } from '../utils/node-polyfill.js';
 import { MemoryManagementSystem } from './memory-management.js';
 
 /**

@@ -3,7 +3,6 @@
  * Implementiert intelligente Datenextraktion mit Qualitätsbewertung
  */
 
-import { EventEmitter } from 'events';
 import { IWebScrapingService } from '../../types/data-acquisition.interface.js';
 import {
   ContentValidation,
@@ -22,6 +21,7 @@ import {
   ValidationMethod,
 } from '../../types/index.js';
 import { Logger } from '../../utils/logger.js';
+import { EventEmitter } from '../../utils/node-polyfill.js';
 
 export class WebScrapingService
   extends EventEmitter
