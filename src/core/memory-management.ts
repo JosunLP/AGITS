@@ -3,6 +3,7 @@ import { DataPersistenceLayer } from '../infrastructure/data-persistence-layer.j
 import {
   ConnectionType,
   ConsolidationPhase,
+  IHierarchicalMemoryManager,
   MemoryConsolidationResult as IMemoryConsolidationResult,
   MemoryInsight as IMemoryInsight,
   LearningExperience,
@@ -54,8 +55,12 @@ interface MemoryEvents extends EventMap {
 /**
  * Hierarchical Temporal Memory System - Implements biological memory patterns
  * with episodic and semantic memory, synaptic plasticity, and memory consolidation
+ * Enhanced with hierarchical levels, ML quality assessment, and pattern recognition
  */
-export class MemoryManagementSystem extends TypedEventEmitter<MemoryEvents> {
+export class MemoryManagementSystem
+  extends TypedEventEmitter<MemoryEvents>
+  implements IHierarchicalMemoryManager
+{
   private logger = new Logger('MemoryManagementSystem');
   private memoryNodes: Map<string, MemoryNode> = new Map();
   private episodicMemory: Map<string, MemoryNode> = new Map();

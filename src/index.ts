@@ -110,13 +110,12 @@ export class AGITSPlatform {
     this.learningOrchestrator = new LearningOrchestrator(this.memorySystem);
     this.attentionManager = new AttentionManager(this.chemicalSignaling);
 
-    // Initialize executive services (temporarily without reasoning engine compatibility)
-    // TODO: Update DecisionEngine to work with enhanced ReasoningEngine
-    // this.decisionEngine = new DecisionEngine(
-    //   this.reasoningEngine,
-    //   this.memorySystem
-    // );
-    // this.planningService = new PlanningService(this.decisionEngine);
+    // Initialize executive services
+    this.decisionEngine = new DecisionEngine(
+      this.reasoningEngine,
+      this.memorySystem
+    );
+    this.planningService = new PlanningService(this.decisionEngine);
 
     // Initialize communication services
     this.nlpService = new NaturalLanguageProcessor();
@@ -125,14 +124,6 @@ export class AGITSPlatform {
     const dataIngestionService = new DataIngestionService();
 
     // Initialize autonomous knowledge collector
-    this.knowledgeCollector = new AutonomousKnowledgeCollector(
-      this.persistenceLayer,
-      this.webScrapingService,
-      this.externalApiService,
-      this.logger
-    );
-
-    // Initialize enhanced autonomous knowledge collector
     this.knowledgeCollector = new AutonomousKnowledgeCollector(
       this.persistenceLayer,
       this.webScrapingService,
@@ -318,10 +309,7 @@ export class AGITSPlatform {
     this.autonomousScheduler.start();
 
     // Start autonomous knowledge collection
-    this.knowledgeCollector.start();
-
-    // Start enhanced autonomous knowledge collection
-    this.knowledgeCollector.start();
+    await this.knowledgeCollector.start();
 
     this.logger.info('Cognitive processes started successfully');
   }

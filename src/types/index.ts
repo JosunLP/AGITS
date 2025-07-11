@@ -1,5 +1,7 @@
 /**
- * Core types and interfaces for the AGI Platform
+ * // Memory types and interfaces
+export * from './memory.interface.js';
+export * from './memory.type.js';pes and interfaces for the AGI Platform
  *
  * This file re-exports all types and interfaces from specialized modules
  * for easy importing across the application.
@@ -54,3 +56,49 @@ export type {
   TriggerCondition,
   TrustedSource,
 } from './data-acquisition.type.js';
+
+// Reinforcement Learning types and interfaces
+export * from './reinforcement-learning.interface.js';
+export {
+  ActionType,
+  ExplorationStrategy,
+  LearningStrategy as RLLearningStrategy,
+  RewardType,
+} from './reinforcement-learning.type.js';
+export type {
+  Episode,
+  Experience,
+  QValue,
+  Action as RLAction,
+  LearningMetrics as RLMetrics,
+  Policy as RLPolicy,
+  State as RLState,
+} from './reinforcement-learning.type.js';
+
+// Machine Learning types and interfaces
+export * from './machine-learning.interface.js';
+export * from './machine-learning.type.js';
+
+// Pattern Recognition types and interfaces
+export * from './pattern-recognition.interface.js';
+export {
+  PatternComplexity,
+  ConfidenceLevel as PatternConfidenceLevel,
+  RelationshipType as PatternRelationshipType,
+  PatternType,
+  RecognitionMethod,
+} from './pattern-recognition.type.js';
+export type {
+  AnomalyPattern,
+  BehavioralPattern,
+  DetectedPattern,
+  PatternEvolution,
+  PatternInstance,
+  PatternRelationship,
+  PatternSearch,
+  PatternSignature,
+  RecognitionMetrics,
+  SemanticPattern,
+  SpatialPattern,
+  TemporalPattern,
+} from './pattern-recognition.type.js';
