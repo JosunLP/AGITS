@@ -1,7 +1,0 @@
-autonomous-knowledge-collector.ts
-enhanced-autonomous-knowledge-collector.ts
-working-autonomous-system-controller.ts
-simplified-autonomous-system-controller.ts
-autonomous-system-controller.ts
-enhanced-autonomous-learning-orchestrator.ts
-README_REMOVE_enhanced-autonomous-knowledge-collector.txt

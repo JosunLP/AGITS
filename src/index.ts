@@ -2,9 +2,7 @@
  * AGITS Platform - Main entry point
  * Advanced General Intelligence Technological System
  *
- * This file initializes a    this.knowledgeManager = new KnowledgeManager(
-      this.dataPersistenceLayer
-    );chestrates all core systems, services, and autonomous processes
+ * This file initializes and orchestrates all core systems, services, and autonomous processes
  * for the AGI platform. It creates a comprehensive cognitive architecture with:
  * - Persistent memory management with consolidation
  * - Autonomous knowledge collection and learning
@@ -31,6 +29,7 @@ import { MemoryManagementSystem } from './core/memory-management.js';
 import { MLQualityAssessmentEngine } from './core/ml-quality-assessment-engine.js';
 import { PatternRecognitionEngine } from './core/pattern-recognition-engine.js';
 import { PerformanceMonitor } from './core/performance-monitor.js';
+import { QualityAssessmentEngine } from './core/quality-assessment-engine.js';
 import { ReinforcementLearningAgent } from './core/reinforcement-learning-agent.js';
 
 // Cognitive services
@@ -153,12 +152,26 @@ export class AGITSPlatform {
     // Initialize sensory services (if needed)
     const dataIngestionService = new DataIngestionService();
 
-    // Initialize autonomous knowledge collector
+    // Initialize quality assessment engine and pattern recognition
+    this.mlQualityEngine = new MLQualityAssessmentEngine(
+      {} as any, // featureExtractor
+      {} as any, // modelTrainer
+      {} as any, // dataPreprocessor
+      {} as any, // modelRegistry
+      {} as any, // inferenceEngine
+      this.logger
+    );
+    this.patternRecognition = new PatternRecognitionEngine();
+
+    // Initialize autonomous knowledge collector with proper implementations
+    const qualityEngine = new QualityAssessmentEngine();
+
     this.knowledgeCollector = new AutonomousKnowledgeCollector(
       this.dataPersistenceLayer,
       this.webScrapingService,
       this.externalApiService,
-      this.logger
+      qualityEngine,
+      this.patternRecognition
     );
 
     // Initialize API controller

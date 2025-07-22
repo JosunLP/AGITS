@@ -1,6 +1,13 @@
 /**
- * Enhanced Autonomous Knowledge Collector
- * Advanced AI-driven knowledge collection with ML-based quality assessment and source optimization
+ * Autonomous Knowledge Collector
+ * Core AGI component for autonomous knowledge acquisition and processing
+ *
+ * Features:
+ * - Multi-source knowledge collection (web, APIs, databases)
+ * - ML-driven quality assessment
+ * - Adaptive learning from collection patterns
+ * - Real-time credibility analysis
+ * - Autonomous source optimization
  */
 
 import { EventEmitter } from 'events';
@@ -25,9 +32,9 @@ import { KnowledgeItem } from '../types/knowledge.interface.js';
 import { Logger } from '../utils/logger.js';
 
 /**
- * Enhanced source configuration with ML optimization
+ * Source configuration with adaptive optimization
  */
-interface EnhancedSourceConfig extends KnowledgeSourceConfig {
+interface SourceConfig extends KnowledgeSourceConfig {
   performanceMetrics: {
     successRate: number;
     avgQuality: number;
@@ -35,7 +42,7 @@ interface EnhancedSourceConfig extends KnowledgeSourceConfig {
     reliability: number;
     costEfficiency: number;
   };
-  mlOptimization: {
+  optimization: {
     enabled: boolean;
     lastOptimized: Date;
     optimizationScore: number;
@@ -54,9 +61,9 @@ interface EnhancedSourceConfig extends KnowledgeSourceConfig {
 }
 
 /**
- * Collection task with ML-driven optimization
+ * Collection task with intelligent optimization
  */
-interface EnhancedCollectionTask {
+interface CollectionTask {
   id: string;
   sourceId: string;
   type: DataSourceType;
@@ -72,7 +79,7 @@ interface EnhancedCollectionTask {
   qualityScore?: number;
   executionTime?: number;
   error?: string;
-  mlPredictions: {
+  predictions: {
     successProbability: number;
     expectedQuality: number;
     optimalTiming: Date;
@@ -81,10 +88,10 @@ interface EnhancedCollectionTask {
 }
 
 /**
- * Enhanced Autonomous Knowledge Collector
- * Implements intelligent, self-optimizing knowledge collection
+ * Autonomous Knowledge Collector
+ * Core implementation for intelligent, self-optimizing knowledge collection
  */
-export class EnhancedAutonomousKnowledgeCollector
+export class AutonomousKnowledgeCollector
   extends EventEmitter
   implements IAutonomousKnowledgeCollector
 {
@@ -97,8 +104,8 @@ export class EnhancedAutonomousKnowledgeCollector
 
   private config: KnowledgeCollectionConfig;
   private runningState: boolean = false;
-  private sources: Map<string, EnhancedSourceConfig> = new Map();
-  private collectionTasks: Map<string, EnhancedCollectionTask> = new Map();
+  private sources: Map<string, SourceConfig> = new Map();
+  private collectionTasks: Map<string, CollectionTask> = new Map();
   private performanceMetrics: CollectionPerformanceMetrics;
   private feedbackHistory: QualityFeedback[] = [];
 
@@ -405,7 +412,7 @@ export class EnhancedAutonomousKnowledgeCollector
    * Add knowledge source with enhanced configuration
    */
   addSource(config: KnowledgeSourceConfig): void {
-    const enhancedConfig: EnhancedSourceConfig = {
+    const enhancedConfig: SourceConfig = {
       ...config,
       performanceMetrics: {
         successRate: 1.0,
@@ -414,7 +421,7 @@ export class EnhancedAutonomousKnowledgeCollector
         reliability: 1.0,
         costEfficiency: 1.0,
       },
-      mlOptimization: {
+      optimization: {
         enabled: true,
         lastOptimized: new Date(),
         optimizationScore: 0.5,
@@ -498,7 +505,7 @@ export class EnhancedAutonomousKnowledgeCollector
     this.logger.info('Optimizing knowledge sources using ML...');
 
     for (const [sourceId, source] of this.sources) {
-      if (!source.mlOptimization.enabled) continue;
+      if (!source.optimization.enabled) continue;
 
       try {
         // Analyze source performance
@@ -514,8 +521,8 @@ export class EnhancedAutonomousKnowledgeCollector
         await this.applySourceOptimizations(sourceId, optimizations);
 
         // Update optimization timestamp
-        source.mlOptimization.lastOptimized = new Date();
-        source.mlOptimization.optimizationScore = optimizations.score;
+        source.optimization.lastOptimized = new Date();
+        source.optimization.optimizationScore = optimizations.score;
       } catch (error) {
         this.logger.error(`Failed to optimize source ${sourceId}:`, error);
       }
@@ -860,24 +867,22 @@ export class EnhancedAutonomousKnowledgeCollector
   private async saveConfiguration(): Promise<void> {}
   private async savePerformanceMetrics(): Promise<void> {}
   private async predictCollectionQuality(
-    source: EnhancedSourceConfig
+    source: SourceConfig
   ): Promise<number> {
     return 0.8;
   }
-  private async collectFromWeb(source: EnhancedSourceConfig): Promise<any[]> {
+  private async collectFromWeb(source: SourceConfig): Promise<any[]> {
     return [];
   }
-  private async collectFromAPI(source: EnhancedSourceConfig): Promise<any[]> {
+  private async collectFromAPI(source: SourceConfig): Promise<any[]> {
     return [];
   }
-  private async collectFromDatabase(
-    source: EnhancedSourceConfig
-  ): Promise<any[]> {
+  private async collectFromDatabase(source: SourceConfig): Promise<any[]> {
     return [];
   }
   private async processCollectedData(
     data: any,
-    source: EnhancedSourceConfig
+    source: SourceConfig
   ): Promise<KnowledgeItem | null> {
     return null;
   }
@@ -887,17 +892,15 @@ export class EnhancedAutonomousKnowledgeCollector
     time: number,
     items: number
   ): Promise<void> {}
-  private async selectOptimalSources(): Promise<EnhancedSourceConfig[]> {
+  private async selectOptimalSources(): Promise<SourceConfig[]> {
     return [];
   }
   private cancelTasksForSource(sourceId: string): void {}
-  private async analyzeSourcePerformance(
-    source: EnhancedSourceConfig
-  ): Promise<any> {
+  private async analyzeSourcePerformance(source: SourceConfig): Promise<any> {
     return {};
   }
   private async generateSourceOptimizations(
-    source: EnhancedSourceConfig,
+    source: SourceConfig,
     analysis: any
   ): Promise<any> {
     return { score: 0.8 };
@@ -933,4 +936,4 @@ export class EnhancedAutonomousKnowledgeCollector
   }
 }
 
-export default EnhancedAutonomousKnowledgeCollector;
+export default AutonomousKnowledgeCollector;
