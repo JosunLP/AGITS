@@ -1,0 +1,1 @@
+Die Datei enhanced-autonomous-knowledge-collector.ts wurde entfernt. Alle erweiterten Features und Typen sind jetzt in der Hauptklasse und den Typdefinitionen integriert. Dopplungen wurden beseitigt. Siehe Changelog und Dokumentation.

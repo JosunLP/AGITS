@@ -1,8 +1,19 @@
 import { DataPersistenceLayer } from '../infrastructure/data-persistence-layer.js';
 import { ExternalApiService } from '../services/data-acquisition/external-api.service.js';
 import { WebScrapingService } from '../services/data-acquisition/web-scraping.service.js';
-import type { ScrapedContent } from '../types/data-acquisition.type.js';
 import type {
+  CollectionStats,
+  KnowledgeCollectionTask,
+  QualityAssessment,
+  SourceConfig,
+} from '../types/autonomous-system.type.js';
+import {
+  ConfidenceLevel,
+  KnowledgeCollectionPriority,
+  QualityLevel,
+} from '../types/autonomous-system.type.js';
+import type { ScrapedContent } from '../types/data-acquisition.type.js';
+import {
   KnowledgeItem,
   KnowledgeMetadata,
 } from '../types/knowledge.interface.js';
@@ -13,90 +24,6 @@ import {
 } from '../types/knowledge.type.js';
 import type { Logger } from '../utils/logger.js';
 import { EventEmitter } from '../utils/node-polyfill.js';
-
-/**
- * Collection Priority Level
- */
-export enum CollectionPriority {
-  LOW = 'low',
-  NORMAL = 'normal',
-  HIGH = 'high',
-  CRITICAL = 'critical',
-}
-
-/**
- * Collection Strategy
- */
-export enum CollectionStrategy {
-  PASSIVE = 'passive',
-  ACTIVE = 'active',
-  HYBRID = 'hybrid',
-  CONTINUOUS = 'continuous',
-  SCHEDULED = 'scheduled',
-}
-
-/**
- * Quality Assessment Result
- */
-export interface QualityAssessment {
-  score: number;
-  level: 'low' | 'medium' | 'high';
-  factors: {
-    relevance: number;
-    reliability: number;
-    freshness: number;
-    completeness: number;
-  };
-  confidence: number;
-}
-
-/**
- * Collection Task Definition
- */
-export interface KnowledgeCollectionTask {
-  id: string;
-  source: string;
-  priority: CollectionPriority;
-  strategy: CollectionStrategy;
-  parameters: Record<string, any>;
-  scheduledTime?: Date;
-  retryCount: number;
-  maxRetries: number;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-/**
- * Collection Statistics
- */
-export interface CollectionStats {
-  totalCollections: number;
-  successfulCollections: number;
-  failedCollections: number;
-  averageCollectionTime: number;
-  lastCollectionTime: Date | null;
-  collectionsToday: number;
-  sourceStats: Map<
-    string,
-    { count: number; successRate: number; avgQuality: number }
-  >;
-  qualityDistribution: { high: number; medium: number; low: number };
-}
-
-/**
- * Source Configuration
- */
-export interface SourceConfig {
-  name: string;
-  type: 'web' | 'api' | 'database' | 'file';
-  url?: string;
-  credentials?: Record<string, string>;
-  rateLimit?: { requests: number; window: number };
-  priority: CollectionPriority;
-  enabled: boolean;
-  metadata: Record<string, any>;
-}
 
 /**
  * Enhanced Autonomous Knowledge Collector
@@ -345,15 +272,17 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
   /**
    * Get minimum interval based on priority
    */
-  private getMinIntervalForPriority(priority: CollectionPriority): number {
+  private getMinIntervalForPriority(
+    priority: KnowledgeCollectionPriority
+  ): number {
     switch (priority) {
-      case CollectionPriority.CRITICAL:
+      case KnowledgeCollectionPriority.CRITICAL:
         return 60000; // 1 minute
-      case CollectionPriority.HIGH:
+      case KnowledgeCollectionPriority.HIGH:
         return 300000; // 5 minutes
-      case CollectionPriority.NORMAL:
+      case KnowledgeCollectionPriority.NORMAL:
         return 900000; // 15 minutes
-      case CollectionPriority.LOW:
+      case KnowledgeCollectionPriority.LOW:
         return 3600000; // 1 hour
       default:
         return 900000;
@@ -500,16 +429,20 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
         factors.completeness) /
       4;
 
-    let level: 'low' | 'medium' | 'high';
-    if (score >= 0.8) level = 'high';
-    else if (score >= 0.5) level = 'medium';
-    else level = 'low';
+    let level: QualityLevel;
+    if (score >= 0.9) level = QualityLevel.EXCELLENT;
+    else if (score >= 0.8) level = QualityLevel.HIGH;
+    else if (score >= 0.5) level = QualityLevel.MEDIUM;
+    else level = QualityLevel.LOW;
+
+    const confidence = Math.min(score + 0.1, 1.0);
 
     return {
       score,
       level,
       factors,
-      confidence: Math.min(score + 0.1, 1.0),
+      confidence,
+      confidenceLevel: this.getConfidenceLevel(confidence) as ConfidenceLevel,
     };
   }
 
@@ -756,15 +689,15 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
   /**
    * Get priority numeric value
    */
-  private getPriorityValue(priority: CollectionPriority): number {
+  private getPriorityValue(priority: KnowledgeCollectionPriority): number {
     switch (priority) {
-      case CollectionPriority.CRITICAL:
+      case KnowledgeCollectionPriority.CRITICAL:
         return 4;
-      case CollectionPriority.HIGH:
+      case KnowledgeCollectionPriority.HIGH:
         return 3;
-      case CollectionPriority.NORMAL:
+      case KnowledgeCollectionPriority.NORMAL:
         return 2;
-      case CollectionPriority.LOW:
+      case KnowledgeCollectionPriority.LOW:
         return 1;
       default:
         return 0;
@@ -815,7 +748,12 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
       lastCollectionTime: null,
       collectionsToday: 0,
       sourceStats: new Map(),
-      qualityDistribution: { high: 0, medium: 0, low: 0 },
+      qualityDistribution: {
+        [QualityLevel.LOW]: 0,
+        [QualityLevel.MEDIUM]: 0,
+        [QualityLevel.HIGH]: 0,
+        [QualityLevel.EXCELLENT]: 0,
+      },
     };
   }
 
@@ -828,7 +766,7 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
       name: 'news-feed',
       type: 'web',
       url: 'https://example.com/news',
-      priority: CollectionPriority.HIGH,
+      priority: KnowledgeCollectionPriority.HIGH,
       enabled: true,
       metadata: { category: 'news', language: 'en' },
     });
@@ -837,7 +775,7 @@ export class AutonomousKnowledgeCollector extends EventEmitter {
       name: 'research-papers',
       type: 'api',
       url: 'https://api.example.com/papers',
-      priority: CollectionPriority.NORMAL,
+      priority: KnowledgeCollectionPriority.NORMAL,
       enabled: true,
       metadata: { category: 'research', format: 'academic' },
     });

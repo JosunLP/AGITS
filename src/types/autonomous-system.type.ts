@@ -3,6 +3,8 @@
  * Unified types for autonomous learning, knowledge collection, and scheduling
  */
 
+import { CollectionStrategy } from './knowledge.type.js';
+
 /**
  * Autonomous Task Types - defining the categories of background processes
  */
@@ -469,4 +471,146 @@ export interface AutonomousSystemEvents {
   learningCycleCompleted: (progress: LearningProgress) => void;
   performanceThresholdReached: (metric: string, value: number) => void;
   systemHealthChanged: (status: 'healthy' | 'degraded' | 'critical') => void;
+}
+
+/**
+ * Quality Assessment
+ */
+export interface QualityAssessment {
+  score: number;
+  level: QualityLevel;
+  confidence: number;
+  confidenceLevel: ConfidenceLevel;
+  factors: {
+    relevance: number;
+    reliability: number;
+    freshness: number;
+    completeness: number;
+    credibility?: number;
+    accuracy?: number;
+    consistency?: number;
+    uniqueness?: number;
+  };
+  metadata?: {
+    assessmentTime?: Date;
+    assessmentModel?: string;
+    sourceCredibility?: number;
+    contentComplexity?: number;
+    languageConfidence?: number;
+  };
+  recommendations?: string[];
+  flags?: string[];
+}
+
+/**
+ * Knowledge Collection Task
+ */
+export interface KnowledgeCollectionTask {
+  id: string;
+  source: string;
+  priority: KnowledgeCollectionPriority;
+  strategy?: CollectionStrategy;
+  parameters?: Record<string, any>;
+  scheduledTime?: Date;
+  retryCount: number;
+  maxRetries: number;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  createdAt: Date;
+  updatedAt: Date;
+  startTime?: Date;
+  endTime?: Date;
+  duration?: number;
+  metadata?: Record<string, any>;
+  qualityConstraints?: {
+    minScore?: number;
+    maxAge?: number;
+    requiredCredibility?: number;
+  };
+  context?: {
+    trigger?: 'scheduled' | 'manual' | 'adaptive' | 'emergency';
+    previousResults?: any[];
+    systemLoad?: number;
+    availableResources?: number;
+  };
+}
+
+/**
+ * Collection Stats
+ */
+export interface CollectionStats {
+  totalCollections: number;
+  successfulCollections: number;
+  failedCollections: number;
+  averageCollectionTime: number;
+  averageQuality?: number;
+  lastCollectionTime: Date | null;
+  collectionsToday: number;
+  dailyTrend?: number[];
+  weeklyTrend?: number[];
+  sourceStats: Map<
+    string,
+    {
+      count: number;
+      successRate: number;
+      avgQuality: number;
+      avgLatency?: number;
+      credibilityScore?: number;
+      lastAccess?: Date;
+      errorRate?: number;
+    }
+  >;
+  qualityDistribution: Record<QualityLevel, number>;
+  performance?: {
+    throughput?: number;
+    efficiency?: number;
+    resourceUtilization?: number;
+    cacheHitRate?: number;
+    networkLatency?: number;
+  };
+  contentAnalytics?: {
+    topTopics?: Array<{ topic: string; count: number; avgQuality: number }>;
+    languageDistribution?: Record<string, number>;
+    domainDistribution?: Record<string, number>;
+    contentTypes?: Record<string, number>;
+  };
+}
+
+/**
+ * Source Config
+ */
+export interface SourceConfig {
+  name: string;
+  type: 'web' | 'api' | 'database' | 'file';
+  url?: string;
+  credentials?: Record<string, string>;
+  rateLimit?: { requests: number; window: number };
+  priority: KnowledgeCollectionPriority;
+  enabled: boolean;
+  metadata: Record<string, any>;
+  adaptiveSettings?: {
+    enabled: boolean;
+    learningRate: number;
+    performanceWindow: number;
+    qualityFeedback: boolean;
+    dynamicRateLimit: boolean;
+    contextualPriority: boolean;
+  };
+  monitoring?: {
+    healthCheck: boolean;
+    responseTimeTracking: boolean;
+    contentChangeDetection: boolean;
+    errorPatternAnalysis: boolean;
+  };
+  cache?: {
+    enabled: boolean;
+    ttl: number;
+    invalidationStrategy: 'time' | 'content' | 'manual';
+    compression: boolean;
+  };
+  preprocessing?: {
+    enabled: boolean;
+    filters: string[];
+    transformations: string[];
+    validation: string[];
+  };
 }
