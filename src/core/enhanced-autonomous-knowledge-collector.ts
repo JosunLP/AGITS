@@ -10,7 +10,6 @@
  * - Autonomous source optimization
  */
 
-import { EventEmitter } from 'events';
 import { DataPersistenceLayer } from '../infrastructure/data-persistence-layer.js';
 import { ExternalApiService } from '../services/data-acquisition/external-api.service.js';
 import { WebScrapingService } from '../services/data-acquisition/web-scraping.service.js';
@@ -29,8 +28,8 @@ import {
   QualityFeedback,
 } from '../types/autonomous-system.type.js';
 import { KnowledgeItem } from '../types/knowledge.interface.js';
+import { TypedEventEmitter } from '../utils/event-emitter.js';
 import { Logger } from '../utils/logger.js';
-
 /**
  * Source configuration with adaptive optimization
  */
@@ -92,7 +91,7 @@ interface CollectionTask {
  * Core implementation for intelligent, self-optimizing knowledge collection
  */
 export class AutonomousKnowledgeCollector
-  extends EventEmitter
+  extends TypedEventEmitter<any>
   implements IAutonomousKnowledgeCollector
 {
   private readonly logger: Logger;

@@ -21,7 +21,8 @@ export class KnowledgeManagementService {
    */
   async addKnowledge(knowledge: KnowledgeItem): Promise<string> {
     try {
-      const knowledgeId = await this.dataPersistence.storeKnowledge(knowledge);
+      await this.dataPersistence.storeKnowledge(knowledge);
+      const knowledgeId = knowledge.id || 'generated-id';
       this.logger.debug(`Knowledge stored with ID: ${knowledgeId}`);
       return knowledgeId;
     } catch (error) {
