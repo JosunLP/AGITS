@@ -336,6 +336,29 @@ Das System implementiert mehrere autonome Lernverfahren, die während der Laufze
 - `GET /api/chemical-signals/stats` - Signalstatistiken
 - `POST /api/chemical-signals/send` - Chemisches Signal senden
 
+## 🧠 Adaptive Wissenssammlung & Qualitätsbewertung
+
+Das System nutzt eine einheitliche, adaptive Wissenssammlung mit folgenden Eigenschaften:
+
+- **Multi-Source & Adaptive**: Automatisches Sammeln von Wissen aus Web, APIs, Datenbanken und weiteren Quellen. Quellen können dynamisch konfiguriert, priorisiert und überwacht werden (z.B. Health-Checks, dynamische Ratenbegrenzung, Preprocessing).
+- **Detaillierte Qualitätsmetriken**: Jede Wissenseinheit wird anhand multipler Faktoren (Relevanz, Zuverlässigkeit, Aktualität, Vollständigkeit, Glaubwürdigkeit, Konsistenz, Einzigartigkeit) bewertet. Adaptive Qualitäts-Schwellen und Empfehlungen sind integriert.
+- **Statistiken & Analytics**: Umfassende Sammlungsstatistiken, Content-Analytics, Performance- und Trenddaten stehen über API zur Verfügung.
+- **Triggerbarkeit & Autonomie**: Wissenssammlung läuft autonom (Scheduler/Event), kann aber jederzeit per API-Befehl manuell ausgelöst werden.
+- **Keine Dopplungen**: Die Architektur ist konsolidiert, alle Features sind in einer zentralen Wissenssammler-Logik vereint.
+
+### API-Endpunkte (Wissenssammlung & Qualität)
+
+- `POST /api/knowledge/trigger-collection` – Wissenssammlung sofort auslösen (manuell)
+- `GET /api/knowledge/collection-stats` – Detaillierte Sammlungsstatistiken und Analytics
+- `GET /api/knowledge/sources` – Verfügbare und konfigurierte Wissensquellen
+- `POST /api/knowledge/sources` – Neue Quelle hinzufügen/konfigurieren
+- `DELETE /api/knowledge/sources/:id` – Quelle entfernen
+- `GET /api/knowledge/quality-metrics` – Qualitätsmetriken und aktuelle Schwellenwerte
+- `POST /api/knowledge/assess-quality` – Einzelne Wissenseinheit bewerten
+- `GET /api/knowledge/recommendations` – Empfehlungen zur Qualitätsverbesserung
+
+Alle bisherigen „enhanced“/„multi-source“/„advanced“-Varianten sind in dieser Architektur konsolidiert und entfallen.
+
 ## 🔬 Erweiterte Reasoning-Fähigkeiten
 
 Das System implementiert fortgeschrittene Reasoning-Techniken:

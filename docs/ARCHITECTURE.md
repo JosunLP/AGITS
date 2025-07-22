@@ -217,21 +217,26 @@ Die Architektur folgt einer modularen Microservices-Struktur, die biologische Pr
 - **Imitation Learning**: Lernen durch Beobachtung menschlicher Experten
 - **Self-Play**: Selbstverbesserung durch interne Simulation
 
-### 6.2 Knowledge Management
+### 6.2 Knowledge Management (Aktualisiert)
 
-#### Knowledge Acquisition
+### Adaptive, Konsolidierte Wissenssammlung
 
-- **Web Scraping Services**: Automatisierte Datensammlung aus dem Internet
-- **API Integration**: Anbindung an externe Wissensquellen
-- **Human-in-the-Loop**: Integration menschlicher Expertise
-- **Cross-Modal Learning**: Lernen über verschiedene Modalitäten hinweg
+- **Zentrale Wissenssammler-Logik**: Alle Features (adaptive Quellen, Qualitätsmetriken, Statistiken) sind in einer konsolidierten Architektur vereint. Es gibt keine separaten „enhanced“/„multi-source“-Varianten mehr.
+- **Adaptive Quellenverwaltung**: Quellen können dynamisch konfiguriert, priorisiert und überwacht werden (Health-Checks, dynamische Ratenbegrenzung, Preprocessing, Caching).
+- **Detaillierte Qualitätsbewertung**: Jede Wissenseinheit wird anhand multipler Faktoren (Relevanz, Zuverlässigkeit, Aktualität, Vollständigkeit, Glaubwürdigkeit, Konsistenz, Einzigartigkeit) bewertet. Adaptive Qualitäts-Schwellen und Empfehlungen sind integriert.
+- **Umfassende Statistiken & Analytics**: Sammlungsstatistiken, Content-Analytics, Performance- und Trenddaten stehen systemweit zur Verfügung.
+- **Triggerbarkeit & Autonomie**: Wissenssammlung läuft autonom (Scheduler/Event), kann aber jederzeit per API-Befehl manuell ausgelöst werden.
 
-#### Knowledge Representation
+### API-Integration
 
-- **Semantic Networks**: Strukturierte Wissensrepräsentation
-- **Ontology Management**: Formale Wissensbeschreibung
-- **Concept Embeddings**: Vektorielle Repräsentation von Konzepten
-- **Temporal Knowledge**: Zeitabhängige Wissensverwaltung
+- `POST /api/knowledge/trigger-collection` – Wissenssammlung sofort auslösen (manuell)
+- `GET /api/knowledge/collection-stats` – Detaillierte Sammlungsstatistiken und Analytics
+- `GET /api/knowledge/sources` – Verfügbare und konfigurierte Wissensquellen
+- `POST /api/knowledge/sources` – Neue Quelle hinzufügen/konfigurieren
+- `DELETE /api/knowledge/sources/:id` – Quelle entfernen
+- `GET /api/knowledge/quality-metrics` – Qualitätsmetriken und aktuelle Schwellenwerte
+- `POST /api/knowledge/assess-quality` – Einzelne Wissenseinheit bewerten
+- `GET /api/knowledge/recommendations` – Empfehlungen zur Qualitätsverbesserung
 
 ## 7. Reasoning und Inference
 
