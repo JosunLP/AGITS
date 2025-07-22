@@ -75,19 +75,21 @@ export interface IAutonomousScheduler {
 }
 
 /**
- * Interface for autonomous knowledge collection
+ * Interface for autonomous knowledge collection with enhanced ML capabilities
  */
 export interface IAutonomousKnowledgeCollector {
   // Lifecycle Management
   start(): Promise<void>;
   stop(): Promise<void>;
+  isRunning(): boolean;
 
-  // Knowledge Collection
+  // Autonomous Collection
   collectNow(): Promise<void>;
   collectFromSource(sourceId: string): Promise<KnowledgeItem[]>;
   collectByType(type: DataSourceType): Promise<KnowledgeItem[]>;
+  triggerEnhancedCollection(): Promise<void>;
 
-  // Source Management
+  // Intelligent Source Management
   addSource(config: KnowledgeSourceConfig): void;
   removeSource(sourceId: string): boolean;
   updateSource(
@@ -96,27 +98,38 @@ export interface IAutonomousKnowledgeCollector {
   ): boolean;
   enableSource(sourceId: string): boolean;
   disableSource(sourceId: string): boolean;
+  optimizeSources(): Promise<void>;
 
-  // Source Query
+  // Advanced Source Query
   getSource(sourceId: string): KnowledgeSourceConfig | null;
   getAllSources(): KnowledgeSourceConfig[];
   getSourcesByType(type: DataSourceType): KnowledgeSourceConfig[];
   getActiveSources(): KnowledgeSourceConfig[];
+  getTrustedSources(): KnowledgeSourceConfig[];
 
-  // Quality Assessment
+  // ML-Enhanced Quality Assessment
   assessKnowledgeQuality(
     knowledge: KnowledgeItem
   ): Promise<KnowledgeQualityMetrics>;
   validateKnowledge(knowledge: KnowledgeItem): Promise<boolean>;
+  assessSourceCredibility(sourceId: string): Promise<number>;
+  detectKnowledgeDuplicates(knowledge: KnowledgeItem): Promise<string[]>;
 
-  // Configuration
+  // Autonomous Learning & Optimization
+  learnFromFeedback(
+    knowledgeId: string,
+    feedback: QualityFeedback
+  ): Promise<void>;
+  adaptCollectionStrategy(): Promise<void>;
+  performMaintenance(): Promise<void>;
+
+  // Configuration & Monitoring
   setConfig(config: KnowledgeCollectionConfig): void;
   getConfig(): KnowledgeCollectionConfig;
-
-  // Statistics & Monitoring
   getCollectionStats(): any;
   getSourceStats(sourceId?: string): any;
   getQualityMetrics(): KnowledgeQualityMetrics;
+  getPerformanceMetrics(): CollectionPerformanceMetrics;
 
   // Event Handling
   on(event: string, handler: Function): void;
@@ -299,6 +312,44 @@ export interface IAdaptiveOptimizer {
   // Results & Analysis
   getOptimizationResults(): Promise<any>;
   analyzeOptimizationImpact(): Promise<any>;
+}
+
+/**
+ * Interface for memory management system
+ */
+export interface IMemoryManager {
+  storeMemory(memory: any): Promise<string>;
+  retrieveMemory(id: string): Promise<any>;
+  consolidateMemories(): Promise<any>;
+  on(event: string, handler: Function): void;
+}
+
+/**
+ * Interface for knowledge management system
+ */
+export interface IKnowledgeManager {
+  addKnowledge(knowledge: any): Promise<string>;
+  searchKnowledge(query: any): Promise<any[]>;
+  validateKnowledge(knowledge: any): Promise<boolean>;
+  on(event: string, handler: Function): void;
+}
+
+/**
+ * Interface for pattern recognition engine
+ */
+export interface IPatternRecognizer {
+  detectPatterns(data: any[]): Promise<any[]>;
+  recognizePattern(data: any, signature: any): Promise<number>;
+  on?(event: string, handler: Function): void;
+}
+
+/**
+ * Interface for reinforcement learning agent
+ */
+export interface IReinforcementLearningAgent {
+  learn(experience: any): Promise<void>;
+  act(state: any): Promise<any>;
+  getMetrics(): any;
 }
 
 /**

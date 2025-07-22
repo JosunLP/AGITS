@@ -35,6 +35,24 @@ export enum KnowledgeSourceType {
   STREAMING_DATA = 'streaming_data',
 }
 
+export enum DataSourceType {
+  WEB_SCRAPING = 'web_scraping',
+  API_INTEGRATION = 'api_integration',
+  MEMORY_ANALYSIS = 'memory_analysis',
+  PATTERN_DISCOVERY = 'pattern_discovery',
+  CROSS_REFERENCE = 'cross_reference',
+  SENSOR_DATA = 'sensor_data',
+  DATABASE_QUERY = 'database_query',
+  FILE_SYSTEM = 'file_system',
+  STREAMING_DATA = 'streaming_data',
+  USER_INTERACTION = 'user_interaction',
+  SYSTEM_OBSERVATION = 'system_observation',
+  EXTERNAL_API = 'external_api',
+  KNOWLEDGE_GRAPH = 'knowledge_graph',
+  INFERENCE = 'inference',
+  REASONING = 'reasoning',
+}
+
 export enum CollectionStrategy {
   WEB_SCRAPING = 'web_scraping',
   API_INTEGRATION = 'api_integration',

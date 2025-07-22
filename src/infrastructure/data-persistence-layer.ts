@@ -936,4 +936,42 @@ export class DataPersistenceLayer {
       throw error;
     }
   }
+
+  /**
+   * Store learning progress
+   */
+  async storeLearningProgress(progress: any): Promise<void> {
+    try {
+      if (!this.mongodb) {
+        throw new Error('MongoDB not connected');
+      }
+      await this.mongodb.collection('learning_progress').insertOne({
+        ...progress,
+        createdAt: new Date(),
+      });
+      this.logger.debug(`Stored learning progress: ${progress.id}`);
+    } catch (error) {
+      this.logger.error('Error storing learning progress:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Store quality feedback
+   */
+  async storeFeedback(feedback: any): Promise<void> {
+    try {
+      if (!this.mongodb) {
+        throw new Error('MongoDB not connected');
+      }
+      await this.mongodb.collection('quality_feedback').insertOne({
+        ...feedback,
+        createdAt: new Date(),
+      });
+      this.logger.debug(`Stored feedback: ${feedback.knowledgeId}`);
+    } catch (error) {
+      this.logger.error('Error storing feedback:', error);
+      throw error;
+    }
+  }
 }

@@ -138,9 +138,13 @@ export interface SystemPerformanceMetrics {
 }
 
 /**
- * Learning Progress Tracking
+ * Enhanced Learning Progress Tracking
  */
 export interface LearningProgress {
+  id: string;
+  strategy: LearningStrategy;
+  startTime: Date;
+  endTime: Date;
   totalLearningCycles: number;
   successfulLearning: number;
   failedLearning: number;
@@ -151,6 +155,14 @@ export interface LearningProgress {
   performanceImprovement: number;
   lastLearningSession: Date;
   learningStreak: number;
+  // Enhanced fields
+  knowledgeGained: number;
+  patternsDiscovered: number;
+  connectionsStrengthened: number;
+  qualityImprovement: number;
+  efficiency: number;
+  insights: string[];
+  metrics: LearningMetrics;
 }
 
 /**
@@ -612,5 +624,116 @@ export interface SourceConfig {
     filters: string[];
     transformations: string[];
     validation: string[];
+  };
+}
+
+/**
+ * Quality feedback for learning from user interactions
+ */
+export interface QualityFeedback {
+  knowledgeId: string;
+  rating: number; // 1-5 scale
+  feedback: 'positive' | 'negative' | 'neutral';
+  reason?: string;
+  userId?: string;
+  timestamp: Date;
+  context?: Record<string, any>;
+}
+
+/**
+ * Collection performance metrics
+ */
+export interface CollectionPerformanceMetrics {
+  totalCollections: number;
+  successfulCollections: number;
+  failedCollections: number;
+  averageCollectionTime: number;
+  sourcesOptimized: number;
+  qualityImprovement: number;
+  efficiencyScore: number;
+  learningAccuracy: number;
+  lastOptimization: Date;
+  trendingMetrics: {
+    dailyCollections: number[];
+    qualityTrend: number[];
+    performanceTrend: number[];
+  };
+}
+
+/**
+ * Enhanced learning strategy with ML integration
+ */
+export enum EnhancedLearningStrategy {
+  SUPERVISED_LEARNING = 'supervised_learning',
+  UNSUPERVISED_LEARNING = 'unsupervised_learning',
+  REINFORCEMENT_LEARNING = 'reinforcement_learning',
+  TRANSFER_LEARNING = 'transfer_learning',
+  FEDERATED_LEARNING = 'federated_learning',
+  ONLINE_LEARNING = 'online_learning',
+  CONTINUAL_LEARNING = 'continual_learning',
+  META_LEARNING = 'meta_learning',
+}
+
+/**
+ * Comprehensive learning metrics for ML performance tracking
+ */
+export interface LearningMetrics {
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1Score: number;
+  learningRate: number;
+  convergenceRate: number;
+  trainingTime: number;
+  evaluationTime: number;
+  memoryUsage: number;
+  cpuUsage: number;
+  epochs: number;
+  loss: number;
+  validationLoss: number;
+  totalSamples: number;
+  correctPredictions: number;
+  adaptationRate: number;
+  explorationRate: number;
+  exploitationBalance: number;
+  averageReward: number;
+  cumulativeReward: number;
+  episodeLength: number;
+  successRate: number;
+  retentionRate: number;
+}
+
+/**
+ * Advanced learning configuration with ML parameters
+ */
+export interface AdvancedLearningConfig extends AutonomousLearningConfig {
+  learningCycleInterval: number;
+  optimizationInterval: number;
+  strategies: EnhancedLearningStrategy[];
+  modelParameters: {
+    learningRate: number;
+    batchSize: number;
+    epochs: number;
+    validationSplit: number;
+    regularization: number;
+    dropout: number;
+  };
+  reinforcementLearning: {
+    explorationRate: number;
+    discountFactor: number;
+    replayBufferSize: number;
+    updateFrequency: number;
+  };
+  qualityAssessment: {
+    enabled: boolean;
+    thresholds: Record<string, number>;
+    mlModel: string;
+    confidenceThreshold: number;
+  };
+  patternRecognition: {
+    enabled: boolean;
+    algorithms: string[];
+    minimumSupport: number;
+    minimumConfidence: number;
   };
 }
