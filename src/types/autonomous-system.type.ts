@@ -737,3 +737,33 @@ export interface AdvancedLearningConfig extends AutonomousLearningConfig {
     minimumConfidence: number;
   };
 }
+
+/**
+ * Complete Autonomous System Configuration
+ */
+export interface AutonomousSystemConfig {
+  enabledComponents: string[];
+  memory: {
+    hebbianLearningRate: number;
+    decayRate: number;
+    pruningThreshold: number;
+    consolidationThreshold: number;
+    maxMemorySize: number;
+    enableConsolidation: boolean;
+    consolidationInterval: number;
+  };
+  learningOrchestrator: AdvancedLearningConfig;
+  knowledgeCollection: KnowledgeCollectionConfig;
+  monitoring: {
+    healthCheckInterval: number;
+    performanceUpdateInterval: number;
+    enableMetricsCollection: boolean;
+    enableAlerting: boolean;
+  };
+  optimization: {
+    autoOptimizationEnabled: boolean;
+    optimizationInterval: number;
+    memoryOptimizationThreshold: number;
+    performanceOptimizationThreshold: number;
+  };
+}
