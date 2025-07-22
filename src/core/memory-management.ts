@@ -1174,6 +1174,37 @@ export class MemoryManagementSystem
       return this.searchMemories({}, undefined, limit);
     }
   }
+
+  /**
+   * Consolidate memories - Public interface for manual consolidation
+   */
+  async consolidateMemories(): Promise<IMemoryConsolidationResult> {
+    const startTime = Date.now();
+
+    try {
+      // Process consolidation queue first
+      while (this.consolidationQueue.length > 0) {
+        await this.performMemoryConsolidation();
+      }
+
+      // Create a basic consolidation result
+      const result: IMemoryConsolidationResult = {
+        consolidatedMemories: [],
+        newConnections: [],
+        strengthenedConnections: [],
+        weakenedConnections: [],
+        prunedMemories: [],
+        insights: [],
+        processingTime: Date.now() - startTime,
+      };
+
+      this.emit('memoryConsolidated', result);
+      return result;
+    } catch (error) {
+      this.logger.error('Memory consolidation failed:', error);
+      throw error;
+    }
+  }
 }
 
 // Helper interfaces

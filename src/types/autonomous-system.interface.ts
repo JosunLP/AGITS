@@ -118,7 +118,7 @@ export interface IAutonomousKnowledgeCollector {
   // Autonomous Learning & Optimization
   learnFromFeedback(
     knowledgeId: string,
-    feedback: QualityFeedback
+    feedback: any // QualityFeedback placeholder
   ): Promise<void>;
   adaptCollectionStrategy(): Promise<void>;
   performMaintenance(): Promise<void>;
@@ -129,7 +129,7 @@ export interface IAutonomousKnowledgeCollector {
   getCollectionStats(): any;
   getSourceStats(sourceId?: string): any;
   getQualityMetrics(): KnowledgeQualityMetrics;
-  getPerformanceMetrics(): CollectionPerformanceMetrics;
+  getPerformanceMetrics(): any; // CollectionPerformanceMetrics placeholder
 
   // Event Handling
   on(event: string, handler: Function): void;

@@ -27,6 +27,7 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "downlevelIteration": true,
     "noEmit": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

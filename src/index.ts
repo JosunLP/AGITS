@@ -2,7 +2,9 @@
  * AGITS Platform - Main entry point
  * Advanced General Intelligence Technological System
  *
- * This file initializes and orchestrates all core systems, services, and autonomous processes
+ * This file initializes a    this.knowledgeManager = new KnowledgeManager(
+      this.dataPersistenceLayer
+    );chestrates all core systems, services, and autonomous processes
  * for the AGI platform. It creates a comprehensive cognitive architecture with:
  * - Persistent memory management with consolidation
  * - Autonomous knowledge collection and learning
@@ -70,7 +72,7 @@ export class AGITSPlatform {
   private patternRecognition: PatternRecognitionEngine;
   private mlQualityEngine: MLQualityAssessmentEngine;
   private reinforcementAgent: ReinforcementLearningAgent;
-  private persistenceLayer: DataPersistenceLayer;
+  private dataPersistenceLayer: DataPersistenceLayer;
 
   // Cognitive services
   private reasoningEngine: ReasoningEngineService;
@@ -88,7 +90,6 @@ export class AGITSPlatform {
   private apiController: APIController;
 
   // Infrastructure
-  private persistenceLayer: DataPersistenceLayer;
   private webScrapingService: WebScrapingService;
   private externalApiService: ExternalApiService;
 
@@ -109,7 +110,7 @@ export class AGITSPlatform {
     this.logger.info('Initializing AGITS Platform core services...');
 
     // Initialize persistence layer
-    this.persistenceLayer = new DataPersistenceLayer(appConfig.database);
+    this.dataPersistenceLayer = new DataPersistenceLayer(appConfig.database);
 
     // Initialize data acquisition services
     this.webScrapingService = new WebScrapingService();
@@ -118,7 +119,7 @@ export class AGITSPlatform {
     // Initialize core systems
     this.memorySystem = new MemoryManagementSystem(
       appConfig.learning,
-      this.persistenceLayer
+      this.dataPersistenceLayer
     );
     this.chemicalSignaling = new ChemicalSignalingSystem();
 
@@ -126,14 +127,16 @@ export class AGITSPlatform {
     this.knowledgeSystem = new KnowledgeManagementSystem(
       this.memorySystem,
       appConfig.learning,
-      this.persistenceLayer
+      this.dataPersistenceLayer
     );
 
     // Initialize autonomous scheduler
     this.autonomousScheduler = new AutonomousProcessScheduler();
 
     // Initialize cognitive services
-    this.reasoningEngine = new ReasoningEngineService(this.persistenceLayer);
+    this.reasoningEngine = new ReasoningEngineService(
+      this.dataPersistenceLayer
+    );
     this.learningOrchestrator = new LearningOrchestrator(this.memorySystem);
     this.attentionManager = new AttentionManager(this.chemicalSignaling);
 
@@ -152,7 +155,7 @@ export class AGITSPlatform {
 
     // Initialize autonomous knowledge collector
     this.knowledgeCollector = new AutonomousKnowledgeCollector(
-      this.persistenceLayer,
+      this.dataPersistenceLayer,
       this.webScrapingService,
       this.externalApiService,
       this.logger
